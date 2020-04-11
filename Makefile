@@ -1,4 +1,4 @@
-APP?=archapp
+APP?=arch-course
 PORT?=8000
 RELEASE?=0.0.1
 
