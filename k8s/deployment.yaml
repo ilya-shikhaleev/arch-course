@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arch-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: arch-app
+  template:
+    metadata:
+      labels:
+        app: arch-app
+    spec:
+      containers:
+        - name: arch-app
+          image: ilyashikhaleev/arch-course:0.0.5
+          ports:
+            - name: web
+              containerPort: 8000

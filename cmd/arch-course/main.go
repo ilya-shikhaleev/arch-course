@@ -41,7 +41,8 @@ func startServer(serverUrl string) *http.Server {
 
 func router() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/health/", healthHandler).Methods(http.MethodGet)
+	r.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
+	r.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
 	return r
 }
 
@@ -49,6 +50,13 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "{\"status\": \"OK\"}")
+}
+
+func infoHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	hostname := os.Getenv("HOSTNAME")
+	io.WriteString(w, "{\"hostname\": \""+hostname+"\"}")
 }
 
 func logMiddleware(h http.Handler) http.Handler {

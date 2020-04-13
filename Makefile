@@ -1,7 +1,7 @@
 APP?=arch-course
 DOCKERHUB?=ilyashikhaleev/arch-course
 PORT?=8000
-RELEASE?=0.0.4
+RELEASE?=0.0.5
 
 all: build
 
