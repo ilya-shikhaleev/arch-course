@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync/atomic"
 	"syscall"
+	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -42,6 +44,7 @@ func startServer(serverUrl string) *http.Server {
 func router() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
+	r.HandleFunc("/ready", readyHandler()).Methods(http.MethodGet)
 	r.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
 	return r
 }
@@ -50,6 +53,26 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "{\"status\": \"OK\"}")
+}
+
+func readyHandler() http.HandlerFunc {
+	isReady := &atomic.Value{}
+	isReady.Store(false)
+
+	go func() {
+		time.Sleep(5 * time.Second) // Some delay for load cache for example
+		isReady.Store(true)
+	}()
+
+	return func(w http.ResponseWriter, _ *http.Request) {
+		if isReady.Load().(bool) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			io.WriteString(w, "{\"status\": \"READY\"}")
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	}
 }
 
 func infoHandler(w http.ResponseWriter, _ *http.Request) {
