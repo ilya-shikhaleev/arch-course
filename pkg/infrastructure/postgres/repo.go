@@ -16,7 +16,7 @@ type userRepository struct {
 	db *sql.DB
 }
 
-func (repo userRepository) Store(user *app.User) error {
+func (repo *userRepository) Store(user *app.User) error {
 	sqlStatement := `
 		INSERT INTO users (id, username, firstname, lastname, email, phone)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -30,7 +30,7 @@ func (repo userRepository) Store(user *app.User) error {
 	return err
 }
 
-func (repo userRepository) Find(id app.UserID) (*app.User, error) {
+func (repo *userRepository) Find(id app.UserID) (*app.User, error) {
 	sqlStatement := `SELECT id, username, firstname, lastname, email, phone FROM users WHERE id=$1;`
 	var user app.User
 	row := repo.db.QueryRow(sqlStatement, string(id))
@@ -44,7 +44,7 @@ func (repo userRepository) Find(id app.UserID) (*app.User, error) {
 	}
 }
 
-func (repo userRepository) FindByUsername(username string) (*app.User, error) {
+func (repo *userRepository) FindByUsername(username string) (*app.User, error) {
 	sqlStatement := `SELECT id, username, firstname, lastname, email, phone FROM users WHERE username=$1;`
 	var user app.User
 	row := repo.db.QueryRow(sqlStatement, string(username))
@@ -58,7 +58,7 @@ func (repo userRepository) FindByUsername(username string) (*app.User, error) {
 	}
 }
 
-func (repo userRepository) Remove(id app.UserID) error {
+func (repo *userRepository) Remove(id app.UserID) error {
 	sqlStatement := `
 		DELETE FROM users
 		WHERE id = $1;`
@@ -66,7 +66,7 @@ func (repo userRepository) Remove(id app.UserID) error {
 	return err
 }
 
-func (repo userRepository) NextID() (app.UserID, error) {
+func (repo *userRepository) NextID() (app.UserID, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return "", err

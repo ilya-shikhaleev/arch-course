@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "arch-chart.fullname" . }}
+  labels:
+    {{- include "arch-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: {{ .Values.appPort }}
+      name: web
+  selector:
+    {{- include "arch-chart.selectorLabels" . | nindent 4 }}

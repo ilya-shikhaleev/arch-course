@@ -15,7 +15,5 @@ build: clean
 
 .PHONY: run
 run:
-	docker stop $(APP) || true && docker rm $(APP) || true
-	docker run --name ${APP} -p ${PORT}:${PORT} --rm \
-		-e "PORT=${PORT}" \
-		$(DOCKERHUB):$(RELEASE)
+	helm uninstall archapp ./arch-chart ; \
+	helm install archapp ./arch-chart

@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync/atomic"
 	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ilya-shikhaleev/arch-course/pkg/app"
@@ -21,7 +21,12 @@ import (
 	"github.com/ilya-shikhaleev/arch-course/pkg/infrastructure/transport"
 )
 
+var db *sql.DB
+var readyDBCh chan *sql.DB
+
 func main() {
+	readyDBCh = make(chan *sql.DB)
+
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.Print("Starting the service...")
@@ -31,6 +36,25 @@ func main() {
 		logger.Fatal("Port is not set.")
 	}
 
+	go func() {
+		db = initDB(logger)
+	}()
+
+	defer func() {
+		if db != nil {
+			_ = db.Close()
+		}
+	}()
+
+	logger.Print("The service is ready to listen and serve.")
+	killSignalChan := getKillSignalChan()
+	srv := startServer(":"+port, logger)
+
+	waitForKillSignal(killSignalChan, logger)
+	_ = srv.Shutdown(context.Background())
+}
+
+func initDB(logger *logrus.Logger) *sql.DB {
 	host := os.Getenv("POSTGRES_HOST")
 	postgresPort := os.Getenv("POSTGRES_PORT")
 	dbname := os.Getenv("POSTGRES_DB")
@@ -39,28 +63,31 @@ func main() {
 	if host == "" || postgresPort == "" || dbname == "" || user == "" || password == "" {
 		logger.Fatal("Postgres env is not set.")
 	}
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, postgresPort, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
 
-	logger.Print("The service is ready to listen and serve.")
-	killSignalChan := getKillSignalChan()
-	srv := startServer(":"+port, logger, db)
+	for {
+		postgresSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			host, postgresPort, user, password, dbname)
+		db, err := sql.Open("postgres", postgresSource)
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't open connection to "+postgresSource))
+			time.Sleep(time.Second)
+			continue
+		}
 
-	waitForKillSignal(killSignalChan, logger)
-	_ = srv.Shutdown(context.Background())
+		err = db.Ping()
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't ping to "+postgresSource))
+			time.Sleep(time.Second)
+			continue
+		}
+		readyDBCh <- db
+		return db
+	}
 }
 
-func startServer(serverUrl string, logger *logrus.Logger, db *sql.DB) *http.Server {
-	router := logMiddleware(httpHandler(logger, db), logger)
+func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
+	m := serveMux(logger)
+	router := logMiddleware(m, logger)
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         serverUrl,
@@ -71,21 +98,24 @@ func startServer(serverUrl string, logger *logrus.Logger, db *sql.DB) *http.Serv
 		logger.Fatal(srv.ListenAndServe())
 	}()
 
+	go func() {
+		db := <-readyDBCh
+		serverErrorLogger := &serverErrorLogger{logger}
+		userService := app.NewUserService(postgres.NewUserRepository(db))
+		m.Handle("/api/v1/", transport.MakeHandler(userService, serverErrorLogger))
+	}()
+
 	return srv
 }
 
-func httpHandler(logger *logrus.Logger, db *sql.DB) http.Handler {
-	serverErrorLogger := &serverErrorLogger{logger}
+func serveMux(logger *logrus.Logger) *http.ServeMux {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 	router.HandleFunc("/ready", readyHandler()).Methods(http.MethodGet)
 	router.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
 
-	userService := app.NewUserService(postgres.NewUserRepository(db))
-
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/api/v1/", transport.MakeHandler(userService, serverErrorLogger))
 	serveMux.Handle("/", router)
 
 	return serveMux
@@ -98,16 +128,8 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func readyHandler() http.HandlerFunc {
-	isReady := &atomic.Value{}
-	isReady.Store(false)
-
-	go func() {
-		time.Sleep(5 * time.Second) // Some delay for load cache for example
-		isReady.Store(true)
-	}()
-
 	return func(w http.ResponseWriter, _ *http.Request) {
-		if isReady.Load().(bool) {
+		if db != nil {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			_, _ = io.WriteString(w, "{\"status\": \"READY\"}")

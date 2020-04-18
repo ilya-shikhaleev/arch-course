@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "post-install-job"
+  labels:
+    {{- include "arch-chart.labels" . | nindent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ .Chart.Name }}
+      labels:
+        {{- include "arch-chart.selectorLabels" . | nindent 8 }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: post-install-job
+          image: postgres:latest
+          env:
+            - name: DATABASE_URI
+              value: {{ printf "postgres://%s:%s@%s:%s/%s" .Values.externalPostgresql.postgresqlUsername .Values.externalPostgresql.postgresqlPassword .Values.externalPostgresql.postgresqlHost .Values.externalPostgresql.postgresqlPort .Values.externalPostgresql.postgresqlDatabase | quote }}
+          command:
+            - sh
+            - "-c"
+            - |
+              psql $DATABASE_URI <<'EOF'
+                CREATE TABLE users (
+                id          varchar(36),
+                username    varchar(255),
+                firstname   text,
+                lastname    text,
+                email       text,
+                phone       text,
+                CONSTRAINT id_key PRIMARY KEY(id),
+                CONSTRAINT uniq_username UNIQUE(username)
+                );
+              EOF
+
+  backoffLimit: 5

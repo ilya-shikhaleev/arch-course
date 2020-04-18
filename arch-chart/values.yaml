@@ -1,0 +1,32 @@
+replicaCount: 2
+
+image:
+  repository: ilyashikhaleev/arch-course
+
+service:
+  type: NodePort
+  port: 9000
+
+appPort: 8000
+
+externalPostgresql:
+  postgresqlUsername: archappuser
+  postgresqlPassword: passwd
+  postgresqlDatabase: archapp-db
+  postgresqlHost: "archapp-postgresql"
+  postgresqlPort: "5432"
+
+ingress:
+  host: "arch.homework"
+  enabled: true
+  paths: ["/otusapp($|/)(.*)"]
+  hosts: ["arch.homework"]
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+postgresql:
+  postgresqlDatabase: archapp-db
+  postgresqlUsername: archappuser
+  postgresqlPassword: passwd
+  service:
+    port: "5432"
