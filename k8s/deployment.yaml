@@ -14,7 +14,20 @@ spec:
     spec:
       containers:
         - name: arch-app
-          image: ilyashikhaleev/arch-course:0.0.5
+          image: ilyashikhaleev/arch-course:0.0.6
+          env:
+            - name: PORT
+              value: "8000"
+            - name: POSTGRES_HOST
+              value: postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: archapp-db
+            - name: POSTGRES_USER
+              value: archappuser
+            - name: POSTGRES_PASSWORD
+              value: passwd
           ports:
             - name: web
               containerPort: 8000
