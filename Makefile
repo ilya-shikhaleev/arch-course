@@ -15,5 +15,6 @@ build: clean
 
 .PHONY: run
 run:
+	helm dependency build ./arch-chart ; \
 	helm uninstall archapp ./arch-chart ; \
 	helm install archapp ./arch-chart
