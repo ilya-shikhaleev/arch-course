@@ -24,7 +24,7 @@ spec:
           image: postgres:latest
           env:
             - name: DATABASE_URI
-              value: {{ printf "postgres://%s:%s@%s:%s/%s" .Values.externalPostgresql.postgresqlUsername .Values.externalPostgresql.postgresqlPassword .Values.externalPostgresql.postgresqlHost .Values.externalPostgresql.postgresqlPort .Values.externalPostgresql.postgresqlDatabase | quote }}
+              value: {{ printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.postgresqlUsername .Values.postgresql.postgresqlPassword (include "postgresql.fullname" .) .Values.postgresql.service.port .Values.postgresql.postgresqlDatabase  | quote }}
           command:
             - sh
             - "-c"

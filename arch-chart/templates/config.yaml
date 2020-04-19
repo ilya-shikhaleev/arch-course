@@ -3,12 +3,11 @@ kind: ConfigMap
 metadata:
   name: archapp-config
 data:
-  PORT: "8000"
-  POSTGRES_HOST: archapp-postgresql
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: archapp-db
-  POSTGRES_USER: archappuser
-  POSTGRES_PASSWORD: passwd
+  PORT: {{ .Values.appPort | quote }}
+  POSTGRES_HOST: {{ include "postgresql.fullname" . }}
+  POSTGRES_PORT: {{ .Values.postgresql.service.port | quote }}
+  POSTGRES_DB: {{ .Values.postgresql.postgresqlDatabase }}
+  POSTGRES_USER: {{ .Values.postgresql.postgresqlUsername }}
 ---
 apiVersion: v1
 kind: Secret
@@ -16,4 +15,4 @@ metadata:
   name: archapp-secret
 type: Opaque
 data:
-  POSTGRES_PASSWORD: {{ .Values.externalPostgresql.postgresqlPassword | b64enc | quote }}
+  POSTGRES_PASSWORD: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}

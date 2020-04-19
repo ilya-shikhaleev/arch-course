@@ -9,13 +9,6 @@ service:
 
 appPort: 8000
 
-externalPostgresql:
-  postgresqlUsername: archappuser
-  postgresqlPassword: passwd
-  postgresqlDatabase: archapp-db
-  postgresqlHost: "archapp-postgresql"
-  postgresqlPort: "5432"
-
 ingress:
   host: "arch.homework"
   enabled: true

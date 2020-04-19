@@ -13,7 +13,10 @@ spec:
           image: postgres:latest
           env:
             - name: POSTGRES_PASSWORD
-              value: "passwd"
+              valueFrom:
+                secretKeyRef:
+                  name: archapp-secret
+                  key: POSTGRES_PASSWORD
           command:
             - sh
             - "-c"
