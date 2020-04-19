@@ -10,6 +10,6 @@ spec:
     - port: {{ .Values.service.port }}
       protocol: TCP
       targetPort: {{ .Values.appPort }}
-      name: web
+      name: http
   selector:
     {{- include "arch-chart.selectorLabels" . | nindent 4 }}
