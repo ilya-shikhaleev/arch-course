@@ -7,6 +7,9 @@ service:
   type: NodePort
   port: 9000
 
+test:
+  user: 2c801978-815c-11ea-a3d4-02420a200002
+
 appPort: 8000
 
 ingress:
