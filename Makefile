@@ -1,7 +1,7 @@
 APP?=arch-course
 DOCKERHUB?=ilyashikhaleev/arch-course
 PORT?=8000
-RELEASE?=0.0.6
+RELEASE?=0.0.7
 
 all: build
 
@@ -15,9 +15,9 @@ build: clean
 
 .PHONY: run
 run:
-	helm dependency build ./arch-chart ; \
+	helm dependency build ./helm/arch-chart ; \
 	helm uninstall archapp ; \
-	helm install archapp ./arch-chart
+	helm install archapp ./helm/arch-chart
 
 .PHONY: k8s-clear
 k8s-clear:
