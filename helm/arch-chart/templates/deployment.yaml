@@ -28,29 +28,32 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: archapp-config
-                  key: PORT
+                  key: {{ .Values.configNames.port }}
             - name: POSTGRES_HOST
-              value: {{ include "postgresql.fullname" . }}
+              valueFrom:
+                configMapKeyRef:
+                  name: archapp-config
+                  key: {{ .Values.configNames.postgresHost }}
             - name: POSTGRES_PORT
               valueFrom:
                 configMapKeyRef:
                   name: archapp-config
-                  key: POSTGRES_PORT
+                  key: {{ .Values.configNames.postgresPort }}
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: archapp-config
-                  key: POSTGRES_DB
+                  key: {{ .Values.configNames.postgresDbName }}
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
                   name: archapp-config
-                  key: POSTGRES_USER
+                  key: {{ .Values.configNames.postgresUser }}
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: archapp-secret
-                  key: POSTGRES_PASSWORD
+                  key: {{ .Values.configNames.postgresPassword }}
 
           livenessProbe:
             httpGet:

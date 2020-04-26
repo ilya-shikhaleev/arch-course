@@ -30,3 +30,11 @@ postgresql:
 metrics:
   serviceMonitor:
     enabled: true
+
+configNames:
+  port: PORT
+  postgresHost: POSTGRES_HOST
+  postgresPort: POSTGRES_PORT
+  postgresDbName: POSTGRES_DB
+  postgresUser: POSTGRES_USER
+  postgresPassword: POSTGRES_PASSWORD
