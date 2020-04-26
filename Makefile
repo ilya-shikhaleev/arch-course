@@ -15,9 +15,13 @@ build: clean
 
 .PHONY: run
 run:
-	helm dependency build ./helm/arch-chart ; \
 	helm uninstall archapp ; \
 	helm install archapp ./helm/arch-chart
+
+.PHONY: update-helm-dependency
+update-helm-dependency:
+	helm dependency update ./helm/arch-chart ; \
+	helm dependency build ./helm/arch-chart
 
 .PHONY: run-stresstest
 run-stresstest:

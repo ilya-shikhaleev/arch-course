@@ -38,3 +38,13 @@ configNames:
   postgresDbName: POSTGRES_DB
   postgresUser: POSTGRES_USER
   postgresPassword: POSTGRES_PASSWORD
+
+prometheus-postgres-exporter:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+  config:
+    autoDiscoverDatabases: true
+    datasourceSecret:
+      name: archapp-secret
+      key: posgressUri
