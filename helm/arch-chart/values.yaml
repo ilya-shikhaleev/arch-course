@@ -48,3 +48,35 @@ prometheus-postgres-exporter:
     datasourceSecret:
       name: archapp-secret
       key: posgressUri
+
+nginx-ingress:
+  controller:
+    kind: DaemonSet
+
+    reportNodeInternalIp: true
+
+    daemonset:
+      useHostPort: true
+      hostPorts:
+        http: 80
+        https: 443
+
+    service:
+      type: NodePort
+
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+prometheus-operator:
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorNamespaceSelector: {}
+      serviceMonitorSelector: {}
+  grafana:
+    sidecar:
+      dashboards:
+        enabled: true
+        label: grafana-dashboard

@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: grafana-import-dashboards
   labels:
-    grafana_dashboard: "1"
+    grafana-dashboard: "1"
 data:
   grafana-net-3-dashboard.json: |
     {
@@ -849,7 +849,7 @@ data:
             {
               "expr": "sum(container_memory_working_set_bytes{container=\"arch-chart\"}) by (pod)",
               "interval": "",
-              "legendFormat": "{{pod}}",
+              "legendFormat": "{{`{{pod}}`}}",
               "refId": "B"
             }
           ],
@@ -943,7 +943,7 @@ data:
             {
               "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{container=\"arch-chart\"}) by (pod)",
               "interval": "",
-              "legendFormat": "{{pod}}",
+              "legendFormat": "{{`{{pod}}`}}",
               "refId": "A"
             }
           ],
@@ -2171,7 +2171,7 @@ data:
               "expr": "pg_stat_database_numbackends{datname=~\"$db\",instance=~\"$host\"}",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{__name__}}",
+              "legendFormat": "{{`{{__name__}}`}}",
               "refId": "A",
               "step": 240
             }
