@@ -19,6 +19,14 @@ run:
 	helm uninstall archapp ; \
 	helm install archapp ./helm/arch-chart
 
+.PHONY: run-stresstest
+run-stresstest:
+	kubectl apply -f ./helm/stresstest.yaml
+
+.PHONY: stop-stresstest
+stop-stresstest:
+	kubectl delete -f ./helm/stresstest.yaml
+
 .PHONY: k8s-clear
 k8s-clear:
 	kubectl delete -f ./k8s/
