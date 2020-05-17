@@ -18,7 +18,7 @@ version: 0.0.3
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 0.0.7
+appVersion: 0.0.8
 
 dependencies:
   - name: postgresql
@@ -27,6 +27,7 @@ dependencies:
     condition: postgresql.enabled
     tags:
       - archapp-database
+
   - name: prometheus-postgres-exporter
     version: "1.3.*"
     repository: "https://kubernetes-charts.storage.googleapis.com"
@@ -34,14 +35,13 @@ dependencies:
     tags:
       - archapp-database
       - archapp-prometheus
-
   - name: prometheus-operator
     version: "8.13.*"
     repository: "https://kubernetes-charts.storage.googleapis.com"
     tags:
       - archapp-prometheus
-  - name: nginx-ingress
-    version: "1.36.*"
+
+  - name: traefik
+    version: "1.86.*"
     repository: "https://kubernetes-charts.storage.googleapis.com"
-    tags:
-      - archapp-prometheus
+    condition: ingress.enabled

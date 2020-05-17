@@ -15,10 +15,12 @@ appPort: 8000
 ingress:
   host: "arch.homework"
   enabled: true
-  paths: ["/otusapp($|/)(.*)"]
+  paths: ["/otusapp"]
   hosts: ["arch.homework"]
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: http,https
+    traefik.frontend.rule.type: PathPrefixStrip
 
 postgresql:
   postgresqlDatabase: archapp-db
@@ -49,25 +51,23 @@ prometheus-postgres-exporter:
       name: archapp-secret
       key: posgressUri
 
-nginx-ingress:
-  controller:
-    kind: DaemonSet
-
-    reportNodeInternalIp: true
-
-    daemonset:
-      useHostPort: true
-      hostPorts:
-        http: 80
-        https: 443
-
-    service:
-      type: NodePort
-
-    metrics:
+traefik:
+  rbac:
+    enabled: true
+  accessLogs:
+    enabled: true
+  metrics:
+    prometheus:
       enabled: true
-      serviceMonitor:
-        enabled: true
+    serviceMonitor:
+      enabled: true
+  ssl:
+    enabled: false
+  deployment:
+    hostPort:
+      httpEnabled: true
+      httpsEnabled: false
+  serviceType: NodePort
 
 prometheus-operator:
   prometheus:

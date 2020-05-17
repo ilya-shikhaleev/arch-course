@@ -21,6 +21,7 @@ run:
 .PHONY: update-helm-dependency
 update-helm-dependency:
 	helm dependency update ./helm/arch-chart
+
 .PHONY: run-stresstest
 run-stresstest:
 	kubectl apply -f ./helm/stresstest.yaml

@@ -41,7 +41,7 @@ spec:
                   CONSTRAINT uniq_username UNIQUE(username)
                 );
                 INSERT INTO users (id, username, firstname, lastname, email, phone)
-                VALUES ('{{ .Values.test.user }}', 'johndoe589', 'John', 'Doe', 'bestjohn@doe.com', '+71002003040')
+                VALUES ('{{ .Values.test.user }}', 'johndoe567', 'John', 'Doe', 'bestjohn@doe.com', '+71002003040')
                 ON CONFLICT (id) DO UPDATE SET username  = EXCLUDED.username,
                                              firstname = EXCLUDED.firstname,
                                              lastname  = EXCLUDED.lastname,

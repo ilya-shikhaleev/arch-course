@@ -103,7 +103,7 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 	_ = prometheus.Register(counter)
 
 	m := serveMux()
-	router := metricsMiddleware(logMiddleware(m, logger), histogram, counter)
+	router := metricsMiddleware(m, histogram, counter)
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         serverUrl,
@@ -160,18 +160,6 @@ func infoHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	hostname := os.Getenv("HOSTNAME")
 	_, _ = io.WriteString(w, "{\"hostname\": \""+hostname+"\"}")
-}
-
-func logMiddleware(h http.Handler, logger *logrus.Logger) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.WithFields(logrus.Fields{
-			"method":     r.Method,
-			"url":        r.URL,
-			"remoteAddr": r.RemoteAddr,
-			"userAgent":  r.UserAgent(),
-		}).Info("got a new request")
-		h.ServeHTTP(w, r)
-	})
 }
 
 func metricsMiddleware(h http.Handler, histogram *prometheus.HistogramVec, counter *prometheus.CounterVec) http.Handler {

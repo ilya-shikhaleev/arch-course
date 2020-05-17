@@ -6,7 +6,7 @@ metadata:
     helm.sh/chart: arch-chart-0.0.2
     app.kubernetes.io/name: arch-chart
     app.kubernetes.io/instance: archapp
-    app.kubernetes.io/version: "0.0.7"
+    app.kubernetes.io/version: "0.0.8"
     app.kubernetes.io/managed-by: Helm
   annotations:
     # This is what defines this resource as a hook. Without this line, the
