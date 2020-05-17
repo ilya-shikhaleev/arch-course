@@ -68,6 +68,20 @@ traefik:
       httpEnabled: true
       httpsEnabled: false
   serviceType: NodePort
+  debug:
+    enabled: true
+  forwardAuth:
+    entryPoints:
+      - http
+      - https
+    trustForwardHeader: true
+    address: http://archappauth-auth-chart.monitoring.svc.cluster.local:9000/auth
+    authResponseHeaders:
+      - X-User
+      - X-Email
+      - X-UserId
+      - X-First-Name
+      - X-Last-Name
 
 prometheus-operator:
   prometheus:

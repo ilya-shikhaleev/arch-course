@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 25,
-  "iteration": 1587934050515,
+  "id": 1,
+  "iteration": 1589735590805,
   "links": [],
   "panels": [
     {
@@ -148,7 +148,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(nginx_ingress_controller_requests[1m]))",
+          "expr": "sum(rate(traefik_backend_requests_total[1m]))",
           "interval": "",
           "legendFormat": "500",
           "refId": "A"
@@ -443,25 +443,25 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(nginx_ingress_controller_request_duration_seconds_bucket[1m])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(traefik_backend_request_duration_seconds_bucket[1m])))",
           "interval": "",
           "legendFormat": "99 quantile",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(nginx_ingress_controller_request_duration_seconds_bucket[1m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traefik_backend_request_duration_seconds_bucket[1m])))",
           "interval": "",
           "legendFormat": "95 quantile",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(nginx_ingress_controller_request_duration_seconds_bucket[1m])))",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(traefik_backend_request_duration_seconds_bucket[1m])))",
           "interval": "",
           "legendFormat": "50 quantile",
           "refId": "C"
         },
         {
-          "expr": "histogram_quantile(1, sum by (le) (rate(nginx_ingress_controller_request_duration_seconds_bucket[1m])))",
+          "expr": "histogram_quantile(1, sum by (le) (rate(traefik_backend_request_duration_seconds_bucket[1m])))",
           "interval": "",
           "legendFormat": "max",
           "refId": "D"
@@ -729,13 +729,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (status) (increase(nginx_ingress_controller_request_duration_seconds_count{status=~\"5.+\"}[1m]))",
+          "expr": "sum by (status) (increase(traefik_backend_request_duration_seconds_count{code=~\"5.+\"}[1m]))",
           "interval": "",
           "legendFormat": "500",
           "refId": "A"
         },
         {
-          "expr": "sum by (status) (increase(nginx_ingress_controller_request_duration_seconds_count{status=~\"4.+\"}[1m]))",
+          "expr": "sum by (status) (increase(traefik_backend_request_duration_seconds_count{code=~\"4.+\"}[1m]))",
           "interval": "",
           "legendFormat": "400",
           "refId": "B"
@@ -2301,5 +2301,5 @@
   "variables": {
     "list": []
   },
-  "version": 7
+  "version": 1
 }

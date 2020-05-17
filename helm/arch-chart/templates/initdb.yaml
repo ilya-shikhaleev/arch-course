@@ -33,6 +33,7 @@ spec:
                 CREATE TABLE users (
                   id          varchar(36),
                   username    varchar(255),
+                  password    varchar(255),
                   firstname   text,
                   lastname    text,
                   email       text,
@@ -40,8 +41,8 @@ spec:
                   CONSTRAINT id_key PRIMARY KEY(id),
                   CONSTRAINT uniq_username UNIQUE(username)
                 );
-                INSERT INTO users (id, username, firstname, lastname, email, phone)
-                VALUES ('{{ .Values.test.user }}', 'johndoe567', 'John', 'Doe', 'bestjohn@doe.com', '+71002003040')
+                INSERT INTO users (id, username, password, firstname, lastname, email, phone)
+                VALUES ('{{ .Values.test.user }}', 'johndoe567', '098f6bcd4621d373cade4e832627b4f6', 'John', 'Doe', 'bestjohn@doe.com', '+71002003040')
                 ON CONFLICT (id) DO UPDATE SET username  = EXCLUDED.username,
                                              firstname = EXCLUDED.firstname,
                                              lastname  = EXCLUDED.lastname,
