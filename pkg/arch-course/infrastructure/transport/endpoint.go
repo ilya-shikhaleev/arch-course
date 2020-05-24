@@ -14,6 +14,7 @@ type createUserRequest struct {
 	LastName  string
 	Email     string
 	Phone     string
+	Password  string
 }
 
 type createUserResponse struct {
@@ -23,13 +24,7 @@ type createUserResponse struct {
 func makeCreateUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createUserRequest)
-		userID, err := s.CreateUser(
-			req.Username,
-			req.FirstName,
-			req.LastName,
-			user.Email(req.Email),
-			user.Phone(req.Phone),
-		)
+		userID, err := s.CreateUser(req.Username, req.FirstName, req.LastName, user.Email(req.Email), user.Phone(req.Phone), req.Password)
 		return createUserResponse{UserID: string(userID)}, err
 	}
 }
@@ -71,9 +66,8 @@ type updateUserRequest struct {
 	Email     string
 	Phone     string
 }
-type updateUserResponse struct {
-	Err error `json:"error,omitempty"`
-}
+
+type updateUserResponse struct{}
 
 func makeUpdateUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -86,7 +80,7 @@ func makeUpdateUserEndpoint(s user.Service) endpoint.Endpoint {
 			user.Email(req.Email),
 			user.Phone(req.Phone),
 		)
-		return updateUserResponse{Err: err}, nil
+		return updateUserResponse{}, err
 	}
 }
 
@@ -94,14 +88,12 @@ type deleteUserRequest struct {
 	UserID string
 }
 
-type deleteUserResponse struct {
-	Err error `json:"error,omitempty"`
-}
+type deleteUserResponse struct{}
 
 func makeDeleteUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteUserRequest)
 		err := s.DeleteUser(user.ID(req.UserID))
-		return deleteUserResponse{Err: err}, nil
+		return deleteUserResponse{}, err
 	}
 }

@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	httplog "github.com/go-kit/kit/log"
@@ -21,6 +22,7 @@ type userInfo struct {
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
+	Password  string `json:"password"`
 }
 
 func MakeHandler(s user.Service, logger httplog.Logger) http.Handler {
@@ -61,6 +63,7 @@ func MakeHandler(s user.Service, logger httplog.Logger) http.Handler {
 	r.Handle("/api/v1/users", createUserHandler).Methods(http.MethodPost)
 	r.Handle("/api/v1/users/{id}", readUserHandler).Methods(http.MethodGet)
 	r.Handle("/api/v1/users/{id}", updateUserHandler).Methods(http.MethodPut)
+	r.Handle("/api/v1/user", updateUserHandler).Methods(http.MethodPut)
 	r.Handle("/api/v1/users/{id}", deleteUserHandler).Methods(http.MethodDelete)
 
 	return r
@@ -78,6 +81,7 @@ func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, e
 		LastName:  info.LastName,
 		Email:     info.Email,
 		Phone:     info.Phone,
+		Password:  info.Password,
 	}
 
 	return req, nil
@@ -90,6 +94,10 @@ func decodeReadUserRequest(_ context.Context, r *http.Request) (interface{}, err
 		return nil, newErrInvalidRequest(nil, "id required for read user request")
 	}
 
+	if r.Header.Get("X-User-Id") != id {
+		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user data (%s != %s)", id, r.Header.Get("X-User-Id")))
+	}
+
 	req := readUserRequest{UserID: id}
 	return req, nil
 }
@@ -98,7 +106,14 @@ func decodeUpdateUserRequest(_ context.Context, r *http.Request) (interface{}, e
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
-		return nil, newErrInvalidRequest(nil, "id required for update user request")
+		if r.Header.Get("X-User-Id") == "" {
+			return nil, newErrInvalidRequest(nil, "id required for update user request")
+		} else {
+			id = r.Header.Get("X-User-Id")
+		}
+	}
+	if r.Header.Get("X-User-Id") != id {
+		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user data (%s != %s)", id, r.Header.Get("X-User-Id")))
 	}
 
 	var info userInfo
@@ -124,6 +139,10 @@ func decodeRemoveUserRequest(_ context.Context, r *http.Request) (interface{}, e
 		return nil, newErrInvalidRequest(nil, "id required for delete user request")
 	}
 
+	if r.Header.Get("X-User-Id") != id {
+		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user data (%s != %s)", id, r.Header.Get("X-User-Id")))
+	}
+
 	req := deleteUserRequest{UserID: id}
 	return req, nil
 }
@@ -144,6 +163,9 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	if invalidRequestErr, ok := err.(*errInvalidRequest); ok {
 		w.WriteHeader(http.StatusBadRequest)
 		err = errors.New(invalidRequestErr.message)
+	} else if unauthorizedErr, ok := err.(*errUnauthorized); ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		err = errors.New(unauthorizedErr.message)
 	} else {
 		switch err {
 		case user.ErrUserNotFound:
@@ -181,4 +203,18 @@ func (e *errInvalidRequest) Error() string {
 		return e.message
 	}
 	return errors.Wrap(e.orig, e.message).Error()
+}
+
+type errUnauthorized struct {
+	message string
+}
+
+func newErrUnauthorized(message string) *errUnauthorized {
+	return &errUnauthorized{
+		message: message,
+	}
+}
+
+func (e *errUnauthorized) Error() string {
+	return e.message
 }

@@ -1,17 +1,93 @@
 {
 	"info": {
-		"_postman_id": "87de7c25-5a0d-40f1-90a7-fceba91eded1",
-		"name": "Arch course users API test",
+		"_postman_id": "1a1bc87d-22e6-4700-9850-443b7708229a",
+		"name": "Авторизация",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Create user",
+			"name": "Logout",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "68fd10fd-84d7-46f7-a6d0-8d24ad8481dc",
+						"id": "9c4fe23b-dcee-4a97-a442-d35b86bdbf1b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get profile error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dff03018-c791-4e4e-9412-b3e7e66170d7",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/userinfo/info",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"userinfo",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8220bc73-941b-4193-a1b0-3fbac98db33c",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -34,20 +110,29 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "68f501f3-d3b0-49eb-b23c-cc0a17206e64",
+						"exec": [
+							"pm.collectionVariables.set(\"login\", pm.variables.replaceIn('{{$randomUserName}}'));",
+							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'));",
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+							"pm.collectionVariables.set(\"lastName\", pm.variables.replaceIn('{{$randomLastName}}'));",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'));",
+							"pm.collectionVariables.set(\"phone\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));"
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
 				"method": "POST",
-				"header": [
-					{
-						"key": "Host",
-						"value": "arch.homework",
-						"type": "text"
-					}
-				],
+				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"johndoe589\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"bestjohn@doe.com\",\n  \"phone\": \"+71002003040\"\n}",
+					"raw": "{\n  \"username\": \"{{login}}\",\n  \"password\": \"{{password}}\",\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -71,19 +156,15 @@
 			"response": []
 		},
 		{
-			"name": "Read user",
+			"name": "Get profile error",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "204a2e9c-77e0-4edf-80c4-455de1d290e2",
+						"id": "ace32762-676b-4808-93a9-93f97edb45c7",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"pm.test(\"User name is valid\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.lastName).to.eql(\"Doe\");",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -94,32 +175,29 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/userinfo/info",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
-						"api",
-						"v1",
-						"users",
-						"{{userId}}"
+						"userinfo",
+						"info"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Update user",
+			"name": "Update user error",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "af42fea1-189e-412b-8166-2fc1626485b8",
+						"id": "acae6629-56fc-41d1-bb5e-c8870cb9ae8d",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -139,37 +217,109 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/user/api/v1/user",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
+						"user",
 						"api",
 						"v1",
-						"users",
-						"{{userId}}"
+						"user"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Read user after update",
+			"name": "Login",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "ef29a7f0-77e7-419e-9eed-1559eb4ed313",
+						"id": "35cbd333-47a3-4adf-ae3b-91cb08b93c3f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"User name is updated\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.lastName).to.eql(\"Wick\");",
-							"});"
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "472fd6c9-e798-47bd-afec-f2ac74061b2d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"id\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"login\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"email\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"first_name\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"last_name\": {",
+							"        \"type\": \"string\"",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.first_name).to.eql(pm.variables.get(\"firstName\"));",
+							"    pm.expect(jsonData.last_name).to.eql(pm.variables.get(\"lastName\"));",
+							"    pm.expect(jsonData.login).to.eql(pm.variables.get(\"login\"));",
+							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"email\"));",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -179,29 +329,26 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/userinfo/info",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
-						"api",
-						"v1",
-						"users",
-						"{{userId}}"
+						"userinfo",
+						"info"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Delete user",
+			"name": "Update user",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "177adaf2-6f0e-45d1-a4cd-41c49ed90c00",
+						"id": "5c02ea54-9f41-4582-8dc3-d33098db33f0",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -209,19 +356,108 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d722bc67-def2-4384-a5f5-46436515377c",
+						"exec": [
+							"pm.collectionVariables.set(\"newLogin\", pm.variables.replaceIn('{{$randomUserName}}'));",
+							"pm.collectionVariables.set(\"newEmail\", pm.variables.replaceIn('{{$randomEmail}}'));"
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
-				"method": "DELETE",
+				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{newLogin}}\",\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{newEmail}}\",\n  \"phone\": \"{{phone}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/user/api/v1/user",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
+						"user",
+						"api",
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f5844832-b665-4fb7-a56a-31c64f22d4a6",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"id\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"login\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"email\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"first_name\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"last_name\": {",
+							"        \"type\": \"string\"",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.firstName).to.eql(pm.variables.get(\"firstName\"));",
+							"    pm.expect(jsonData.lastName).to.eql(pm.variables.get(\"lastName\"));",
+							"    pm.expect(jsonData.username).to.eql(pm.variables.get(\"newLogin\"));",
+							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"newEmail\"));",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
 						"api",
 						"v1",
 						"users",
@@ -232,15 +468,125 @@
 			"response": []
 		},
 		{
-			"name": "Read user after delete",
+			"name": "Get profile",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "92a2ba97-b91b-4d1e-87bb-9d3d271ee1e2",
+						"id": "64a9d937-a420-4b00-a120-b362cd7e213b",
 						"exec": [
-							"pm.test(\"Status code is 404\", function () {",
-							"    pm.response.to.have.status(404);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"id\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"login\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"email\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"first_name\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"last_name\": {",
+							"        \"type\": \"string\"",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.first_name).to.eql(pm.variables.get(\"firstName\"));",
+							"    pm.expect(jsonData.last_name).to.eql(pm.variables.get(\"lastName\"));",
+							"    pm.expect(jsonData.login).to.eql(pm.variables.get(\"login\")); // this data is cached",
+							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"email\"));",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/userinfo/info",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"userinfo",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d914049c-7fb0-443e-9451-960e59b7d3ff",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get profile error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "04d64b55-5917-4327-ac73-6d05a7312c84",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -251,17 +597,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/userinfo/info",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
-						"api",
-						"v1",
-						"users",
-						"{{userId}}"
+						"userinfo",
+						"info"
 					]
 				}
 			},
@@ -272,7 +615,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "7ac5e55a-20f8-4176-82c6-b0caa948794a",
+				"id": "20389290-a44e-44ff-b11e-460020372e97",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -282,7 +625,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "86dc59be-a5a3-47f4-9278-bff22580082a",
+				"id": "b184611b-0b89-407a-80a0-e3f5bb157bdb",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -292,14 +635,68 @@
 	],
 	"variable": [
 		{
-			"id": "11a79e8c-b71e-4ee4-8b7f-7ba1081b96ab",
+			"id": "a2c66ca2-2481-49d1-a7c1-cc7edd13f6e4",
 			"key": "baseUrl",
 			"value": "arch.homework",
 			"type": "string"
 		},
 		{
-			"id": "d44897d5-2607-462e-9e79-3b733a6b3997",
+			"id": "bcd8fc9d-b34b-4122-9d3f-81fa10076c3d",
 			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "507077ef-5a92-419e-a325-f343c9a51351",
+			"key": "login",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "ce632eab-dca4-4108-96d1-473f4f87c849",
+			"key": "email",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "865252d7-8842-4c01-802a-abe656f45b29",
+			"key": "firstName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "eb6c0801-46b5-426d-af08-be16b38b5b8b",
+			"key": "lastName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "810af5e7-bbcd-4147-8b99-174cbc472deb",
+			"key": "password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "16b9bc9a-b633-4f86-b8d2-ad43b91b678c",
+			"key": "phone",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "534ed9c7-da8c-4ae1-ba83-4483b4fcb46e",
+			"key": "id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "11509069-39fa-4505-aa22-37c39df7dba9",
+			"key": "newEmail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "26a0a46f-6eb9-47f0-becc-105dbec382bd",
+			"key": "newLogin",
 			"value": "",
 			"type": "string"
 		}

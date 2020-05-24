@@ -13,10 +13,11 @@ type Repository interface {
 }
 
 type User struct {
-	ID        ID
-	Username  string
-	FirstName string
-	LastName  string
-	Email     Email
-	Phone     Phone
+	ID          ID
+	Username    string
+	FirstName   string
+	LastName    string
+	Email       Email
+	Phone       Phone
+	EncodedPass string
 }

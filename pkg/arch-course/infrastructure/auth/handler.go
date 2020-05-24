@@ -7,15 +7,19 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
 )
 
 type SessionService struct {
 	sessions map[string]session
+	repo     user.Repository
+	encoder  user.PassEncoder
 }
 
-func NewSessionService() *SessionService {
+func NewSessionService(repo user.Repository, encoder user.PassEncoder) *SessionService {
 	sessions := make(map[string]session)
-	return &SessionService{sessions: sessions}
+	return &SessionService{sessions: sessions, repo: repo, encoder: encoder}
 }
 
 type session struct {
@@ -63,18 +67,26 @@ func (service *SessionService) LoginHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if data.Login != "johndoe567" || data.Password != "test" {
-		w.WriteHeader(http.StatusUnauthorized)
+	u, err := service.repo.FindByUsername(data.Login)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, err.Error())
+		return
+	}
+
+	if service.encoder.Encode(data.Password) != u.EncodedPass {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, "Invalid password")
 		return
 	}
 
 	sessionID := generateSessionID()
 	service.sessions[sessionID] = session{
-		id:        "1234",
-		login:     "4234",
-		email:     "54325",
-		firstName: "2341234234",
-		lastName:  "23452345",
+		id:        string(u.ID),
+		login:     u.Username,
+		email:     string(u.Email),
+		firstName: u.FirstName,
+		lastName:  u.LastName,
 	}
 
 	c := &http.Cookie{

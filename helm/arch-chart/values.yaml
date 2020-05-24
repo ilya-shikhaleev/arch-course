@@ -13,14 +13,23 @@ test:
 appPort: 8000
 
 ingress:
-  host: "arch.homework"
   enabled: true
-  paths: ["/otusapp"]
   hosts: ["arch.homework"]
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.entrypoints: http,https
-    traefik.frontend.rule.type: PathPrefixStrip
+  authenticated:
+    paths: ["/user"]
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/router.entrypoints: http,https
+      traefik.frontend.rule.type: PathPrefixStrip
+      ingress.kubernetes.io/auth-type: forward
+      ingress.kubernetes.io/auth-url: http://archapp-arch-chart.arch-course.svc.cluster.local:9000/auth
+      ingress.kubernetes.io/auth-response-headers: X-User-Id, X-Email, X-Login, X-First-Name, X-Last-Name
+  guest:
+    paths: ["/otusapp"]
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/router.entrypoints: http,https
+      traefik.frontend.rule.type: PathPrefixStrip
 
 postgresql:
   postgresqlDatabase: archapp-db

@@ -20,6 +20,7 @@ import (
 
 	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
 	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/auth"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/encoding"
 	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/postgres"
 	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/transport"
 )
@@ -118,23 +119,27 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 	go func() {
 		db := <-readyDBCh
 		serverErrorLogger := &serverErrorLogger{logger}
-		userService := user.NewService(postgres.NewUserRepository(db))
+		userService := user.NewService(postgres.NewUserRepository(db), encoding.MD5Encoder())
 		m.Handle("/api/v1/", transport.MakeHandler(userService, serverErrorLogger))
+
+		router := mux.NewRouter()
+		sessionService := auth.NewSessionService(postgres.NewUserRepository(db), encoding.MD5Encoder())
+		router.HandleFunc("/auth", sessionService.AuthHandler)
+		router.HandleFunc("/login", sessionService.LoginHandler).Methods(http.MethodPost)
+		router.HandleFunc("/logout", sessionService.LogoutHandler).Methods(http.MethodPost)
+		m.Handle("/auth", router)
+		m.Handle("/login", router)
+		m.Handle("/logout", router)
 	}()
 
 	return srv
 }
 
 func serveMux() *http.ServeMux {
-	sessionService := auth.NewSessionService()
-
 	router := mux.NewRouter()
 	router.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 	router.HandleFunc("/ready", readyHandler()).Methods(http.MethodGet)
 	router.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
-	router.HandleFunc("/auth", sessionService.AuthHandler)
-	router.HandleFunc("/login", sessionService.LoginHandler).Methods(http.MethodPost)
-	router.HandleFunc("/logout", sessionService.LogoutHandler).Methods(http.MethodPost)
 	router.Handle("/metrics", promhttp.Handler())
 
 	serveMux := http.NewServeMux()

@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	CreateUser(username, firstName, lastName string, email Email, phone Phone) (ID, error)
+	CreateUser(username, firstName, lastName string, email Email, phone Phone, password string) (ID, error)
 	UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error
 	DeleteUser(id ID) error
 
@@ -13,15 +13,16 @@ type Service interface {
 	ReadUser(id ID) (*User, error)
 }
 
-func NewService(repo Repository) Service {
-	return &userService{repo}
+func NewService(repo Repository, passEncoder PassEncoder) Service {
+	return &userService{repo, passEncoder}
 }
 
 type userService struct {
-	repo Repository
+	repo        Repository
+	passEncoder PassEncoder
 }
 
-func (s *userService) CreateUser(username, firstName, lastName string, email Email, phone Phone) (userID ID, err error) {
+func (s *userService) CreateUser(username, firstName, lastName string, email Email, phone Phone, password string) (userID ID, err error) {
 	if u, err := s.repo.FindByUsername(username); u != nil {
 		return userID, ErrDuplicateUsername
 	} else if err != ErrUserNotFound {
@@ -33,12 +34,13 @@ func (s *userService) CreateUser(username, firstName, lastName string, email Ema
 		return "", err
 	}
 	err = s.repo.Store(&User{
-		ID:        userID,
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-		Email:     email,
-		Phone:     phone,
+		ID:          userID,
+		Username:    username,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Email:       email,
+		Phone:       phone,
+		EncodedPass: s.passEncoder.Encode(password),
 	})
 
 	return userID, err

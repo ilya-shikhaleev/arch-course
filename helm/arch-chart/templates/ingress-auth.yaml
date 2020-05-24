@@ -1,16 +1,16 @@
 {{- if .Values.ingress.enabled -}}
 {{- $serviceName := include "arch-chart.fullname" . -}}
 {{- $servicePort := .Values.service.port -}}
-{{- $guestPaths := .Values.ingress.guest.paths -}}
+{{- $paths := .Values.ingress.authenticated.paths -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ include "arch-chart.fullname" . }}-guest
+  name: {{ include "arch-chart.fullname" . }}-authenticated
   labels:
     {{- include "arch-chart.labels" . | nindent 4 }}
-  {{- if .Values.ingress.guest.annotations }}
+  {{- if .Values.ingress.authenticated.annotations }}
   annotations:
-  {{ toYaml .Values.ingress.guest.annotations | nindent 4 }}
+  {{ toYaml .Values.ingress.authenticated.annotations | nindent 4 }}
 {{- end }}
 spec:
   rules:
@@ -19,7 +19,7 @@ spec:
   - host: {{ $host }}
     http:
       paths:
-  {{- range $p := $guestPaths }}
+  {{- range $p := $paths }}
       - path: {{ $p }}
         backend:
           serviceName: {{ $serviceName }}

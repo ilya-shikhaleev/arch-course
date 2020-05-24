@@ -9,26 +9,26 @@ import (
 
 func TestUserService_CreateUser(t *testing.T) {
 	repo := &mockRepo{}
-	service := NewService(repo)
+	service := NewService(repo, mockEncoder())
 
-	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900")
+	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900", "")
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(repo.users))
 	user, err := repo.Find(userID)
 	assert.Nil(t, err)
 	assert.NotNil(t, 1, user)
 
-	_, err = service.CreateUser("username", "first name", "last name", "some@email.ru", "900")
+	_, err = service.CreateUser("username", "first name", "last name", "some@email.ru", "900", "")
 	assert.Equal(t, ErrDuplicateUsername, err)
 }
 
 func TestUserService_UpdateUser(t *testing.T) {
 	repo := &mockRepo{}
-	service := NewService(repo)
+	service := NewService(repo, mockEncoder())
 
-	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900")
+	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900", "")
 	assert.Nil(t, err)
-	_, err = service.CreateUser("username2", "first name2", "last name2", "some@email.ru", "900")
+	_, err = service.CreateUser("username2", "first name2", "last name2", "some@email.ru", "900", "")
 	assert.Nil(t, err)
 
 	err = service.UpdateUser(userID, "username2", "first name", "last name", "some@email.ru", "900")
@@ -91,4 +91,10 @@ func (repo *mockRepo) NextID() (ID, error) {
 		return "", err
 	}
 	return ID(id.String()), nil
+}
+
+func mockEncoder() EncoderFunc {
+	return func(s string) string {
+		return s
+	}
 }
