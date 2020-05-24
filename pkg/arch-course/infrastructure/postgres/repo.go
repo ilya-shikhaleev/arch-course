@@ -5,10 +5,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/app"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
 )
 
-func NewUserRepository(db *sql.DB) app.UserRepository {
+func NewUserRepository(db *sql.DB) user.Repository {
 	return &userRepository{db: db}
 }
 
@@ -16,7 +16,7 @@ type userRepository struct {
 	db *sql.DB
 }
 
-func (repo *userRepository) Store(user *app.User) error {
+func (repo *userRepository) Store(user *user.User) error {
 	sqlStatement := `
 		INSERT INTO users (id, username, firstname, lastname, email, phone)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -30,35 +30,35 @@ func (repo *userRepository) Store(user *app.User) error {
 	return err
 }
 
-func (repo *userRepository) Find(id app.UserID) (*app.User, error) {
+func (repo *userRepository) Find(id user.ID) (*user.User, error) {
 	sqlStatement := `SELECT id, username, firstname, lastname, email, phone FROM users WHERE id=$1;`
-	var user app.User
+	var u user.User
 	row := repo.db.QueryRow(sqlStatement, string(id))
-	switch err := row.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.Email, &user.Phone); err {
+	switch err := row.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.Email, &u.Phone); err {
 	case sql.ErrNoRows:
-		return nil, app.ErrUserNotFound
+		return nil, user.ErrUserNotFound
 	case nil:
-		return &user, nil
+		return &u, nil
 	default:
 		return nil, err
 	}
 }
 
-func (repo *userRepository) FindByUsername(username string) (*app.User, error) {
+func (repo *userRepository) FindByUsername(username string) (*user.User, error) {
 	sqlStatement := `SELECT id, username, firstname, lastname, email, phone FROM users WHERE username=$1;`
-	var user app.User
+	var u user.User
 	row := repo.db.QueryRow(sqlStatement, string(username))
-	switch err := row.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.Email, &user.Phone); err {
+	switch err := row.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.Email, &u.Phone); err {
 	case sql.ErrNoRows:
-		return nil, app.ErrUserNotFound
+		return nil, user.ErrUserNotFound
 	case nil:
-		return &user, nil
+		return &u, nil
 	default:
 		return nil, err
 	}
 }
 
-func (repo *userRepository) Remove(id app.UserID) error {
+func (repo *userRepository) Remove(id user.ID) error {
 	sqlStatement := `
 		DELETE FROM users
 		WHERE id = $1;`
@@ -66,10 +66,10 @@ func (repo *userRepository) Remove(id app.UserID) error {
 	return err
 }
 
-func (repo *userRepository) NextID() (app.UserID, error) {
+func (repo *userRepository) NextID() (user.ID, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return "", err
 	}
-	return app.UserID(id.String()), nil
+	return user.ID(id.String()), nil
 }

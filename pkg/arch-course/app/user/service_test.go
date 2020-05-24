@@ -1,4 +1,4 @@
-package app
+package user
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestUserService_CreateUser(t *testing.T) {
 	repo := &mockRepo{}
-	service := NewUserService(repo)
+	service := NewService(repo)
 
 	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900")
 	assert.Nil(t, err)
@@ -24,7 +24,7 @@ func TestUserService_CreateUser(t *testing.T) {
 
 func TestUserService_UpdateUser(t *testing.T) {
 	repo := &mockRepo{}
-	service := NewUserService(repo)
+	service := NewService(repo)
 
 	userID, err := service.CreateUser("username", "first name", "last name", "some@email.ru", "900")
 	assert.Nil(t, err)
@@ -57,7 +57,7 @@ func (repo *mockRepo) Store(user *User) error {
 	return nil
 }
 
-func (repo *mockRepo) Find(id UserID) (*User, error) {
+func (repo *mockRepo) Find(id ID) (*User, error) {
 	for _, u := range repo.users {
 		if u.ID == id {
 			return u, nil
@@ -75,7 +75,7 @@ func (repo *mockRepo) FindByUsername(username string) (*User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (repo *mockRepo) Remove(id UserID) error {
+func (repo *mockRepo) Remove(id ID) error {
 	for i, u := range repo.users {
 		if u.ID == id {
 			repo.users = append(repo.users[:i], repo.users[i+1:]...)
@@ -85,10 +85,10 @@ func (repo *mockRepo) Remove(id UserID) error {
 	return ErrUserNotFound
 }
 
-func (repo *mockRepo) NextID() (UserID, error) {
+func (repo *mockRepo) NextID() (ID, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return "", err
 	}
-	return UserID(id.String()), nil
+	return ID(id.String()), nil
 }

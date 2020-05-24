@@ -18,9 +18,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/app"
-	"github.com/ilya-shikhaleev/arch-course/pkg/infrastructure/postgres"
-	"github.com/ilya-shikhaleev/arch-course/pkg/infrastructure/transport"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/auth"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/postgres"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/infrastructure/transport"
 )
 
 var db *sql.DB
@@ -60,15 +61,15 @@ func initDB(logger *logrus.Logger) *sql.DB {
 	host := os.Getenv("POSTGRES_HOST")
 	postgresPort := os.Getenv("POSTGRES_PORT")
 	dbname := os.Getenv("POSTGRES_DB")
-	user := os.Getenv("POSTGRES_USER")
+	dbUser := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
-	if host == "" || postgresPort == "" || dbname == "" || user == "" || password == "" {
+	if host == "" || postgresPort == "" || dbname == "" || dbUser == "" || password == "" {
 		logger.Fatal("Postgres env is not set.")
 	}
 
 	for {
 		postgresSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			host, postgresPort, user, password, dbname)
+			host, postgresPort, dbUser, password, dbname)
 		db, err := sql.Open("postgres", postgresSource)
 		if err != nil {
 			logger.Info(errors.Wrap(err, "can't open connection to "+postgresSource))
@@ -103,7 +104,7 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 	_ = prometheus.Register(counter)
 
 	m := serveMux()
-	router := metricsMiddleware(m, histogram, counter)
+	router := metricsMiddleware(logMiddleware(m, logger), histogram, counter)
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         serverUrl,
@@ -117,7 +118,7 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 	go func() {
 		db := <-readyDBCh
 		serverErrorLogger := &serverErrorLogger{logger}
-		userService := app.NewUserService(postgres.NewUserRepository(db))
+		userService := user.NewService(postgres.NewUserRepository(db))
 		m.Handle("/api/v1/", transport.MakeHandler(userService, serverErrorLogger))
 	}()
 
@@ -125,10 +126,15 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 }
 
 func serveMux() *http.ServeMux {
+	sessionService := auth.NewSessionService()
+
 	router := mux.NewRouter()
 	router.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 	router.HandleFunc("/ready", readyHandler()).Methods(http.MethodGet)
 	router.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
+	router.HandleFunc("/auth", sessionService.AuthHandler)
+	router.HandleFunc("/login", sessionService.LoginHandler).Methods(http.MethodPost)
+	router.HandleFunc("/logout", sessionService.LogoutHandler).Methods(http.MethodPost)
 	router.Handle("/metrics", promhttp.Handler())
 
 	serveMux := http.NewServeMux()
@@ -160,6 +166,22 @@ func infoHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	hostname := os.Getenv("HOSTNAME")
 	_, _ = io.WriteString(w, "{\"hostname\": \""+hostname+"\"}")
+}
+
+func logMiddleware(h http.Handler, logger *logrus.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusWriter := statusWriter{ResponseWriter: w}
+		h.ServeHTTP(&statusWriter, r)
+		if r.URL.Path != "/health" && r.URL.Path != "/ready" && r.URL.Path != "/metrics" {
+			logger.WithFields(logrus.Fields{
+				"method":     r.Method,
+				"url":        r.URL,
+				"remoteAddr": r.RemoteAddr,
+				"userAgent":  r.UserAgent(),
+				"code":       statusWriter.status,
+			}).Info("got a new request")
+		}
+	})
 }
 
 func metricsMiddleware(h http.Handler, histogram *prometheus.HistogramVec, counter *prometheus.CounterVec) http.Handler {

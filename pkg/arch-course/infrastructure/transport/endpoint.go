@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/app"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
 )
 
 type createUserRequest struct {
@@ -20,15 +20,15 @@ type createUserResponse struct {
 	UserID string `json:"userId,omitempty"`
 }
 
-func makeCreateUserEndpoint(s app.UserService) endpoint.Endpoint {
+func makeCreateUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createUserRequest)
 		userID, err := s.CreateUser(
 			req.Username,
 			req.FirstName,
 			req.LastName,
-			app.Email(req.Email),
-			app.Phone(req.Phone),
+			user.Email(req.Email),
+			user.Phone(req.Phone),
 		)
 		return createUserResponse{UserID: string(userID)}, err
 	}
@@ -46,18 +46,18 @@ type readUserResponse struct {
 	Phone     string `json:"phone,omitempty"`
 }
 
-func makeReadUserEndpoint(s app.UserService) endpoint.Endpoint {
+func makeReadUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(readUserRequest)
-		if user, err := s.ReadUser(app.UserID(req.UserID)); err != nil {
+		if u, err := s.ReadUser(user.ID(req.UserID)); err != nil {
 			return readUserResponse{}, err
 		} else {
 			return readUserResponse{
-				Username:  user.Username,
-				FirstName: user.FirstName,
-				LastName:  user.LastName,
-				Email:     string(user.Email),
-				Phone:     string(user.Phone),
+				Username:  u.Username,
+				FirstName: u.FirstName,
+				LastName:  u.LastName,
+				Email:     string(u.Email),
+				Phone:     string(u.Phone),
 			}, nil
 		}
 	}
@@ -75,16 +75,16 @@ type updateUserResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func makeUpdateUserEndpoint(s app.UserService) endpoint.Endpoint {
+func makeUpdateUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateUserRequest)
 		err := s.UpdateUser(
-			app.UserID(req.UserID),
+			user.ID(req.UserID),
 			req.Username,
 			req.FirstName,
 			req.LastName,
-			app.Email(req.Email),
-			app.Phone(req.Phone),
+			user.Email(req.Email),
+			user.Phone(req.Phone),
 		)
 		return updateUserResponse{Err: err}, nil
 	}
@@ -98,10 +98,10 @@ type deleteUserResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func makeDeleteUserEndpoint(s app.UserService) endpoint.Endpoint {
+func makeDeleteUserEndpoint(s user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteUserRequest)
-		err := s.DeleteUser(app.UserID(req.UserID))
+		err := s.DeleteUser(user.ID(req.UserID))
 		return deleteUserResponse{Err: err}, nil
 	}
 }

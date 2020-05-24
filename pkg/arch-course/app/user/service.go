@@ -1,27 +1,27 @@
-package app
+package user
 
 import (
 	"errors"
 )
 
-type UserService interface {
-	CreateUser(username, firstName, lastName string, email Email, phone Phone) (UserID, error)
-	UpdateUser(id UserID, username, firstName, lastName string, email Email, phone Phone) error
-	DeleteUser(id UserID) error
+type Service interface {
+	CreateUser(username, firstName, lastName string, email Email, phone Phone) (ID, error)
+	UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error
+	DeleteUser(id ID) error
 
 	// Should be moved to QueryService with UserView model
-	ReadUser(id UserID) (*User, error)
+	ReadUser(id ID) (*User, error)
 }
 
-func NewUserService(repo UserRepository) UserService {
+func NewService(repo Repository) Service {
 	return &userService{repo}
 }
 
 type userService struct {
-	repo UserRepository
+	repo Repository
 }
 
-func (s *userService) CreateUser(username, firstName, lastName string, email Email, phone Phone) (userID UserID, err error) {
+func (s *userService) CreateUser(username, firstName, lastName string, email Email, phone Phone) (userID ID, err error) {
 	if u, err := s.repo.FindByUsername(username); u != nil {
 		return userID, ErrDuplicateUsername
 	} else if err != ErrUserNotFound {
@@ -44,7 +44,7 @@ func (s *userService) CreateUser(username, firstName, lastName string, email Ema
 	return userID, err
 }
 
-func (s *userService) UpdateUser(id UserID, username, firstName, lastName string, email Email, phone Phone) error {
+func (s *userService) UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error {
 	user, err := s.repo.Find(id)
 	if err != nil {
 		return err
@@ -64,11 +64,11 @@ func (s *userService) UpdateUser(id UserID, username, firstName, lastName string
 	return s.repo.Store(user)
 }
 
-func (s *userService) DeleteUser(id UserID) error {
+func (s *userService) DeleteUser(id ID) error {
 	return s.repo.Remove(id)
 }
 
-func (s *userService) ReadUser(id UserID) (*User, error) {
+func (s *userService) ReadUser(id ID) (*User, error) {
 	return s.repo.Find(id)
 }
 

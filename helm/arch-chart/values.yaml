@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: ilyashikhaleev/arch-course
@@ -66,22 +66,11 @@ traefik:
   deployment:
     hostPort:
       httpEnabled: true
+      httpPort: 8080
       httpsEnabled: false
   serviceType: NodePort
   debug:
     enabled: true
-  forwardAuth:
-    entryPoints:
-      - http
-      - https
-    trustForwardHeader: true
-    address: http://archappauth-auth-chart.monitoring.svc.cluster.local:9000/auth
-    authResponseHeaders:
-      - X-User
-      - X-Email
-      - X-UserId
-      - X-First-Name
-      - X-Last-Name
 
 prometheus-operator:
   prometheus:

@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/app"
+	"github.com/ilya-shikhaleev/arch-course/pkg/arch-course/app/user"
 )
 
 type userInfo struct {
@@ -23,7 +23,7 @@ type userInfo struct {
 	Phone     string `json:"phone"`
 }
 
-func MakeHandler(s app.UserService, logger httplog.Logger) http.Handler {
+func MakeHandler(s user.Service, logger httplog.Logger) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
@@ -146,9 +146,9 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		err = errors.New(invalidRequestErr.message)
 	} else {
 		switch err {
-		case app.ErrUserNotFound:
+		case user.ErrUserNotFound:
 			w.WriteHeader(http.StatusNotFound)
-		case app.ErrDuplicateUsername:
+		case user.ErrDuplicateUsername:
 			w.WriteHeader(http.StatusBadRequest)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)

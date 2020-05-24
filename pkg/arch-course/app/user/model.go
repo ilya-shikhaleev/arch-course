@@ -1,19 +1,19 @@
-package app
+package user
 
-type UserID string
+type ID string
 type Email string
 type Phone string
 
-type UserRepository interface {
+type Repository interface {
 	Store(*User) error
-	Find(UserID) (*User, error)
+	Find(ID) (*User, error)
 	FindByUsername(string) (*User, error)
-	Remove(UserID) error
-	NextID() (UserID, error)
+	Remove(ID) error
+	NextID() (ID, error)
 }
 
 type User struct {
-	ID        UserID
+	ID        ID
 	Username  string
 	FirstName string
 	LastName  string

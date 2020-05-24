@@ -1,0 +1,48 @@
+replicaCount: 1
+
+image:
+  repository: ilyashikhaleev/arch-course-user-info
+
+service:
+  type: NodePort
+  port: 9000
+
+test:
+  user: 2c801978-815c-11ea-a3d4-02420a200002
+
+appPort: 8000
+configNames:
+  port: PORT
+
+ingress:
+  host: "arch.homework"
+  enabled: true
+  paths: ["/userinfo"]
+  hosts: ["arch.homework"]
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: http,https
+    traefik.frontend.rule.type: PathPrefixStrip
+    ingress.kubernetes.io/auth-type: forward
+    ingress.kubernetes.io/auth-url: http://archapp-arch-chart.arch-course.svc.cluster.local:9000/auth
+    ingress.kubernetes.io/auth-response-headers: X-User-Id, X-Email, X-Login, X-First-Name, X-Last-Name
+
+traefik:
+  rbac:
+    enabled: true
+  accessLogs:
+    enabled: true
+  metrics:
+    prometheus:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+  ssl:
+    enabled: false
+  deployment:
+    hostPort:
+      httpEnabled: true
+      httpsEnabled: false
+  serviceType: NodePort
+  debug:
+    enabled: true

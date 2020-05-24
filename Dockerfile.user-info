@@ -26,7 +26,7 @@ RUN CGO_ENABLED=0 go test -v ./... \
  && CGO_ENABLED=0 go vet ./...
 
 # Build application
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ./bin/auth ./cmd/auth
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ./bin/user-info ./cmd/user-info
 
 
 ###################
@@ -41,9 +41,9 @@ COPY --from=builder /etc/group /etc/group
 # Enviroment variables for application
 ENV PORT 8000
 EXPOSE $PORT
-COPY --from=builder /go/src/github.com/ilya-shikhaleev/arch-course/bin/auth .
+COPY --from=builder /go/src/github.com/ilya-shikhaleev/arch-course/bin/user-info .
 
 # Use archuser
 USER archuser:archuser
-#ENTRYPOINT ["./auth"]
-CMD ["./auth"]
+#ENTRYPOINT ["./user-info"]
+CMD ["./user-info"]
