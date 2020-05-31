@@ -27,7 +27,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -58,7 +58,10 @@
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
-							"});"
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -106,6 +109,10 @@
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
 							"pm.collectionVariables.set(\"userId\", jsonData.userId);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
 							""
 						],
 						"type": "text/javascript"
@@ -165,7 +172,11 @@
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
-							"});"
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -198,7 +209,11 @@
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
-							"});"
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -243,7 +258,10 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							""
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -319,6 +337,10 @@
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
 							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
 							""
 						],
 						"type": "text/javascript"
@@ -352,7 +374,11 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -441,7 +467,10 @@
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
 							"pm.collectionVariables.set(\"id\", jsonData.id);",
-							""
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -511,7 +540,10 @@
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
 							"pm.collectionVariables.set(\"id\", jsonData.id);",
-							""
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -545,7 +577,10 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							""
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -556,7 +591,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -587,7 +622,10 @@
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
-							"});"
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -605,6 +643,335 @@
 					"path": [
 						"userinfo",
 						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50de6c28-d3a4-446e-9340-d76f7a3d4032",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							" \"userId\": {",
+							" \"type\": \"string\"",
+							" }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"userId2\", jsonData.userId);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d827ffcc-0b40-4303-a24e-39e0b6ebd82c",
+						"exec": [
+							"pm.collectionVariables.set(\"login2\", pm.variables.replaceIn('{{$randomUserName}}'));",
+							"pm.collectionVariables.set(\"password2\", pm.variables.replaceIn('{{$randomPassword}}'));",
+							"pm.collectionVariables.set(\"firstName2\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+							"pm.collectionVariables.set(\"lastName2\", pm.variables.replaceIn('{{$randomLastName}}'));",
+							"pm.collectionVariables.set(\"email2\", pm.variables.replaceIn('{{$randomEmail}}'));",
+							"pm.collectionVariables.set(\"phone2\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{login2}}\",\n  \"password\": \"{{password2}}\",\n  \"firstName\": \"{{firstName2}}\",\n  \"lastName\": \"{{lastName2}}\",\n  \"email\": \"{{email2}}\",\n  \"phone\": \"{{phone2}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "69be5755-2577-498d-b959-077894ea088c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{login2}}\",\n  \"password\": \"{{password2}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update first user error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2046faf6-fd51-466c-8ce7-68ac71bc9253",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"johndoe589\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Wick\",\n    \"email\": \"john@wick.com\",\n    \"phone\": \"+71002003040\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"api",
+						"v1",
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read first user error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c9e9ed0b-1c76-4cd1-81ae-797d8308665f",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"api",
+						"v1",
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67ba3c52-a603-42e0-acb8-13e01aff9cca",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"id\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"login\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"email\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"first_name\": {",
+							"        \"type\": \"string\"",
+							"    },",
+							"    \"last_name\": {",
+							"        \"type\": \"string\"",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.firstName).to.eql(pm.variables.get(\"firstName2\"));",
+							"    pm.expect(jsonData.lastName).to.eql(pm.variables.get(\"lastName2\"));",
+							"    pm.expect(jsonData.username).to.eql(pm.variables.get(\"login2\"));",
+							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"email2\"));",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId2}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"api",
+						"v1",
+						"users",
+						"{{userId2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e50ba88-1a25-4182-9403-a8522680a4de",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"otusapp",
+						"logout"
 					]
 				}
 			},
@@ -635,68 +1002,110 @@
 	],
 	"variable": [
 		{
-			"id": "a2c66ca2-2481-49d1-a7c1-cc7edd13f6e4",
+			"id": "6f87d5cb-d6a0-455e-9d27-46ea8484afde",
 			"key": "baseUrl",
 			"value": "arch.homework",
 			"type": "string"
 		},
 		{
-			"id": "bcd8fc9d-b34b-4122-9d3f-81fa10076c3d",
+			"id": "5ab26e45-c193-4b76-91db-be115b4e4105",
 			"key": "userId",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "507077ef-5a92-419e-a325-f343c9a51351",
+			"id": "78be35c1-5cfd-4644-b8cd-40adb1507562",
 			"key": "login",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "ce632eab-dca4-4108-96d1-473f4f87c849",
+			"id": "14d7c7c2-c152-4585-95a8-60eba5ce3630",
 			"key": "email",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "865252d7-8842-4c01-802a-abe656f45b29",
+			"id": "f81d69b4-2df6-4cfe-98de-48ba2861262b",
 			"key": "firstName",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "eb6c0801-46b5-426d-af08-be16b38b5b8b",
+			"id": "4c6bbd67-4663-498a-94e7-5ebb1885685b",
 			"key": "lastName",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "810af5e7-bbcd-4147-8b99-174cbc472deb",
+			"id": "87b11805-415e-4477-b31e-941fbea1650f",
 			"key": "password",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "16b9bc9a-b633-4f86-b8d2-ad43b91b678c",
+			"id": "3ff8a748-3394-4766-b16a-ea8419e9f654",
 			"key": "phone",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "534ed9c7-da8c-4ae1-ba83-4483b4fcb46e",
+			"id": "7bf7b4d8-b9ae-4f4d-9624-a3a62dcdd254",
 			"key": "id",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "11509069-39fa-4505-aa22-37c39df7dba9",
+			"id": "3c51ab30-afd5-4094-a00c-8e84ed97b3c9",
 			"key": "newEmail",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "26a0a46f-6eb9-47f0-becc-105dbec382bd",
+			"id": "57b76767-65cc-4e53-ad2a-faa8c52cb925",
 			"key": "newLogin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "7b375be0-91ad-423a-8b1a-ed836053fd37",
+			"key": "email2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "8f2db78e-13e9-43f3-9aef-23aa15f5eace",
+			"key": "firstName2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "2ff5886a-929b-4b7e-a61f-0dd6bf976404",
+			"key": "lastName2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "33a53f7e-6745-42a6-a251-5fc7e43b7c8b",
+			"key": "login2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "87c4022c-5b4b-498c-9ded-77e7cf585c70",
+			"key": "password2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "e12a598b-ba3e-42b5-b1ad-afa6c645ddc0",
+			"key": "phone2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "52d4190c-924d-4ebe-84d0-7e29593e3db4",
+			"key": "userId2",
 			"value": "",
 			"type": "string"
 		}
