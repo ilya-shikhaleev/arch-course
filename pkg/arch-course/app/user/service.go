@@ -4,25 +4,16 @@ import (
 	"errors"
 )
 
-type Service interface {
-	CreateUser(username, firstName, lastName string, email Email, phone Phone, password string) (ID, error)
-	UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error
-	DeleteUser(id ID) error
-
-	// Should be moved to QueryService with UserView model
-	ReadUser(id ID) (*User, error)
+func NewService(repo Repository, passEncoder PassEncoder) *Service {
+	return &Service{repo, passEncoder}
 }
 
-func NewService(repo Repository, passEncoder PassEncoder) Service {
-	return &userService{repo, passEncoder}
-}
-
-type userService struct {
+type Service struct {
 	repo        Repository
 	passEncoder PassEncoder
 }
 
-func (s *userService) CreateUser(username, firstName, lastName string, email Email, phone Phone, password string) (userID ID, err error) {
+func (s *Service) CreateUser(username, firstName, lastName string, email Email, phone Phone, password string) (userID ID, err error) {
 	if u, err := s.repo.FindByUsername(username); u != nil {
 		return userID, ErrDuplicateUsername
 	} else if err != ErrUserNotFound {
@@ -46,7 +37,7 @@ func (s *userService) CreateUser(username, firstName, lastName string, email Ema
 	return userID, err
 }
 
-func (s *userService) UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error {
+func (s *Service) UpdateUser(id ID, username, firstName, lastName string, email Email, phone Phone) error {
 	user, err := s.repo.Find(id)
 	if err != nil {
 		return err
@@ -66,11 +57,11 @@ func (s *userService) UpdateUser(id ID, username, firstName, lastName string, em
 	return s.repo.Store(user)
 }
 
-func (s *userService) DeleteUser(id ID) error {
+func (s *Service) DeleteUser(id ID) error {
 	return s.repo.Remove(id)
 }
 
-func (s *userService) ReadUser(id ID) (*User, error) {
+func (s *Service) ReadUser(id ID) (*User, error) {
 	return s.repo.Find(id)
 }
 

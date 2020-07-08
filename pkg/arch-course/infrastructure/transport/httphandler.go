@@ -25,7 +25,7 @@ type userInfo struct {
 	Password  string `json:"password"`
 }
 
-func MakeHandler(s user.Service, logger httplog.Logger) http.Handler {
+func MakeHandler(s *user.Service, logger httplog.Logger) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),

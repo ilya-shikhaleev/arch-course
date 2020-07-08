@@ -21,7 +21,7 @@ type createUserResponse struct {
 	UserID string `json:"userId,omitempty"`
 }
 
-func makeCreateUserEndpoint(s user.Service) endpoint.Endpoint {
+func makeCreateUserEndpoint(s *user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createUserRequest)
 		userID, err := s.CreateUser(req.Username, req.FirstName, req.LastName, user.Email(req.Email), user.Phone(req.Phone), req.Password)
@@ -41,7 +41,7 @@ type readUserResponse struct {
 	Phone     string `json:"phone,omitempty"`
 }
 
-func makeReadUserEndpoint(s user.Service) endpoint.Endpoint {
+func makeReadUserEndpoint(s *user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(readUserRequest)
 		if u, err := s.ReadUser(user.ID(req.UserID)); err != nil {
@@ -69,7 +69,7 @@ type updateUserRequest struct {
 
 type updateUserResponse struct{}
 
-func makeUpdateUserEndpoint(s user.Service) endpoint.Endpoint {
+func makeUpdateUserEndpoint(s *user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(updateUserRequest)
 		err := s.UpdateUser(
@@ -90,7 +90,7 @@ type deleteUserRequest struct {
 
 type deleteUserResponse struct{}
 
-func makeDeleteUserEndpoint(s user.Service) endpoint.Endpoint {
+func makeDeleteUserEndpoint(s *user.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteUserRequest)
 		err := s.DeleteUser(user.ID(req.UserID))
