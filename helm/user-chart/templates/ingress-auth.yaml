@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+{{- $serviceName := include "user-chart.fullname" . -}}
+{{- $servicePort := .Values.service.port -}}
+{{- $paths := .Values.ingress.authenticated.paths -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "user-chart.fullname" . }}-authenticated
+  labels:
+    {{- include "user-chart.labels" . | nindent 4 }}
+  {{- if .Values.ingress.authenticated.annotations }}
+  annotations:
+  {{ toYaml .Values.ingress.authenticated.annotations | nindent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- if .Values.ingress.hosts }}
+  {{- range $host := .Values.ingress.hosts }}
+  - host: {{ $host }}
+    http:
+      paths:
+  {{- range $p := $paths }}
+      - path: {{ $p }}
+        backend:
+          serviceName: {{ $serviceName }}
+          servicePort: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- end -}}
+{{- end -}}

@@ -5,6 +5,11 @@
 
 1) Запустите k8s
 
+Запуск миникуба:
+```
+minikube start --vm-driver=none && kubectl create namespace arch-course && kubens arch-course
+```
+
 2) Добавьте namespace arch-course
 ```
 kubectl create namespace arch-course && kubens arch-course

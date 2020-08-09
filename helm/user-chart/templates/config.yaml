@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-config
+data:
+  {{ .Values.configNames.port }}: {{ .Values.appPort | quote }}
+  {{ .Values.configNames.postgresHost }}: {{ include "postgresql.fullname" . }}
+  {{ .Values.configNames.postgresPort }}: {{ .Values.postgresql.service.port | quote }}
+  {{ .Values.configNames.postgresDbName }}: {{ .Values.postgresql.postgresqlDatabase }}
+  {{ .Values.configNames.postgresUser }}: {{ .Values.postgresql.postgresqlUsername }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-secret
+type: Opaque
+data:
+  {{ .Values.configNames.postgresPassword }}: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+  posgressUri: {{ printf "postgresql://%s:%s@%s:%s/%s?sslmode=disable" .Values.postgresql.postgresqlUsername .Values.postgresql.postgresqlPassword (include "postgresql.fullname" .) .Values.postgresql.service.port .Values.postgresql.postgresqlDatabase | b64enc | quote }}

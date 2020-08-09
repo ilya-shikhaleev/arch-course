@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-info-config
-data:
-  {{ .Values.configNames.port }}: {{ .Values.appPort | quote }}
