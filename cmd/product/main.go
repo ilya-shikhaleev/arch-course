@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,12 +13,20 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ilya-shikhaleev/arch-course/pkg/product/infrastructure/postgres"
+	"github.com/ilya-shikhaleev/arch-course/pkg/product/infrastructure/transport"
 )
 
+var db *sql.DB
+var readyDBCh chan *sql.DB
+
 func main() {
+	readyDBCh = make(chan *sql.DB)
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.Print("Starting the service...")
@@ -27,6 +35,16 @@ func main() {
 	if port == "" {
 		logger.Fatal("Port is not set.")
 	}
+
+	go func() {
+		db = initDB(logger)
+	}()
+
+	defer func() {
+		if db != nil {
+			_ = db.Close()
+		}
+	}()
 
 	logger.Print("The service is ready to listen and serve.")
 	killSignalChan := getKillSignalChan()
@@ -60,6 +78,13 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 		WriteTimeout: 15 * time.Second,
 	}
 	go func() {
+		db := <-readyDBCh
+		serverErrorLogger := &serverErrorLogger{logger}
+		repo := postgres.NewProductRepository(db)
+		m.Handle("/api/v1/", transport.MakeHandler(repo, serverErrorLogger))
+	}()
+
+	go func() {
 		logger.Fatal(srv.ListenAndServe())
 	}()
 
@@ -85,8 +110,7 @@ func logMiddleware(h http.Handler, logger *logrus.Logger) http.Handler {
 func serveMux() *http.ServeMux {
 	router := mux.NewRouter()
 	router.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
-	router.HandleFunc("/ready", readyHandler).Methods(http.MethodGet)
-	router.HandleFunc("/info", infoHandler).Methods(http.MethodGet)
+	router.HandleFunc("/ready", readyHandler()).Methods(http.MethodGet)
 	router.Handle("/metrics", promhttp.Handler())
 
 	serveMux := http.NewServeMux()
@@ -101,41 +125,16 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	_, _ = io.WriteString(w, "{\"status\": \"OK\"}")
 }
 
-func readyHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, _ = io.WriteString(w, "{\"status\": \"READY\"}")
-}
-
-func infoHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("X-User-Id") == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+func readyHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		if db != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = io.WriteString(w, "{\"status\": \"READY\"}")
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
 	}
-
-	response := struct {
-		ID        string `json:"id"`
-		Login     string `json:"login"`
-		Email     string `json:"email"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-	}{
-		r.Header.Get("X-User-Id"),
-		r.Header.Get("X-Login"),
-		r.Header.Get("X-Email"),
-		r.Header.Get("X-First-Name"),
-		r.Header.Get("X-Last-Name"),
-	}
-
-	result, err := json.Marshal(response)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, _ = io.WriteString(w, string(result))
 }
 
 func metricsMiddleware(h http.Handler, histogram *prometheus.HistogramVec, counter *prometheus.CounterVec) http.Handler {
@@ -186,4 +185,44 @@ func waitForKillSignal(killSignalChan <-chan os.Signal, logger *logrus.Logger) {
 	case syscall.SIGTERM:
 		logger.Info("got SIGTERM...")
 	}
+}
+
+func initDB(logger *logrus.Logger) *sql.DB {
+	host := os.Getenv("POSTGRES_HOST")
+	postgresPort := os.Getenv("POSTGRES_PORT")
+	dbname := os.Getenv("POSTGRES_DB")
+	dbUser := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	if host == "" || postgresPort == "" || dbname == "" || dbUser == "" || password == "" {
+		logger.Fatal("Postgres env is not set.")
+	}
+
+	for {
+		postgresSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			host, postgresPort, dbUser, password, dbname)
+		db, err := sql.Open("postgres", postgresSource)
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't open connection to "+postgresSource))
+			time.Sleep(time.Second)
+			continue
+		}
+
+		err = db.Ping()
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't ping to "+postgresSource))
+			time.Sleep(time.Second)
+			continue
+		}
+		readyDBCh <- db
+		return db
+	}
+}
+
+type serverErrorLogger struct {
+	*logrus.Logger
+}
+
+func (l *serverErrorLogger) Log(args ...interface{}) error {
+	l.Error(args...)
+	return nil
 }

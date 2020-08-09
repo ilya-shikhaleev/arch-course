@@ -63,5 +63,6 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "postgresql.fullname" -}}
-{{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "user" "postgresql" | trunc 63 | trimSuffix "-" -}}
+{{/*{{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}*/}}
 {{- end -}}

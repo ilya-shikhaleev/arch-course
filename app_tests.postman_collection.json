@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "1a1bc87d-22e6-4700-9850-443b7708229a",
-		"name": "Авторизация",
+		"_postman_id": "28440346-6458-4760-a4bc-43319119f78f",
+		"name": "Проект",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9c4fe23b-dcee-4a97-a442-d35b86bdbf1b",
+						"id": "27e7ee2a-8754-45d7-a407-20e7a9e03c99",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -35,13 +35,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"raw": "http://{{baseUrl}}/logout",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"logout"
 					]
 				}
@@ -49,12 +48,12 @@
 			"response": []
 		},
 		{
-			"name": "Get profile error",
+			"name": "Get product error",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "dff03018-c791-4e4e-9412-b3e7e66170d7",
+						"id": "86cc1524-ae65-4289-ab70-b378027dc8c7",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -71,14 +70,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/userinfo/info",
+					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"userinfo",
-						"info"
+						"api",
+						"v1",
+						"products",
+						"72eb9cf0-da7f-11ea-ab94-02420a200004"
 					]
 				}
 			},
@@ -90,7 +91,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8220bc73-941b-4193-a1b0-3fbac98db33c",
+						"id": "7c22c081-7cb9-4d80-9b6a-1cd8ed17adae",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -121,7 +122,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "68f501f3-d3b0-49eb-b23c-cc0a17206e64",
+						"id": "b91e3056-3683-4d57-b2c7-88aea84f87ac",
 						"exec": [
 							"pm.collectionVariables.set(\"login\", pm.variables.replaceIn('{{$randomUserName}}'));",
 							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'));",
@@ -147,28 +148,28 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users",
+					"raw": "http://{{baseUrl}}/api/v1/users/signup",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"api",
 						"v1",
-						"users"
+						"users",
+						"signup"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get profile error",
+			"name": "Get product error",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "ace32762-676b-4808-93a9-93f97edb45c7",
+						"id": "7e0794ab-981b-4b4a-a870-8dd6b4687e6e",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -186,14 +187,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/userinfo/info",
+					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"userinfo",
-						"info"
+						"api",
+						"v1",
+						"products",
+						"72eb9cf0-da7f-11ea-ab94-02420a200004"
 					]
 				}
 			},
@@ -205,7 +208,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "acae6629-56fc-41d1-bb5e-c8870cb9ae8d",
+						"id": "cc768594-00eb-4474-9e32-bfa08551af3c",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -232,16 +235,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/user",
+					"raw": "http://{{baseUrl}}/api/v1/users",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
-						"user"
+						"users"
 					]
 				}
 			},
@@ -253,7 +255,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "35cbd333-47a3-4adf-ae3b-91cb08b93c3f",
+						"id": "a9dfdd27-bd74-4039-be24-13bbd0eefc42",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -280,13 +282,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/login",
+					"raw": "http://{{baseUrl}}/login",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"login"
 					]
 				}
@@ -294,33 +295,43 @@
 			"response": []
 		},
 		{
-			"name": "Get profile",
+			"name": "Get product",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "472fd6c9-e798-47bd-afec-f2ac74061b2d",
+						"id": "1e706cae-87c1-481b-8bdd-050dd6d9b94f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
 							"var schema = {",
-							"    \"id\": {",
-							"        \"type\": \"string\"",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"metaProductID\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"title\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"description\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"material\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"price\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"height\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"color\": {",
+							"            \"type\": \"string\"",
+							"        }",
 							"    },",
-							"    \"login\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"email\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"first_name\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"last_name\": {",
-							"        \"type\": \"string\"",
-							"    }",
+							"    \"required\": [\"metaProductID\", \"title\", \"description\", \"material\", \"price\"]",
 							"};",
 							"",
 							"var jsonData = pm.response.json();",
@@ -329,10 +340,9 @@
 							"});",
 							"",
 							"pm.test(\"Data is valid\", function () {",
-							"    pm.expect(jsonData.first_name).to.eql(pm.variables.get(\"firstName\"));",
-							"    pm.expect(jsonData.last_name).to.eql(pm.variables.get(\"lastName\"));",
-							"    pm.expect(jsonData.login).to.eql(pm.variables.get(\"login\"));",
-							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"email\"));",
+							"    pm.expect(jsonData.title).to.eql(\"Gopher\");",
+							"    pm.expect(jsonData.price).to.eql(10);",
+							"    pm.expect(jsonData.height).to.eql(35);",
 							"});",
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
@@ -351,14 +361,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/userinfo/info",
+					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"userinfo",
-						"info"
+						"api",
+						"v1",
+						"products",
+						"72eb9cf0-da7f-11ea-ab94-02420a200004"
 					]
 				}
 			},
@@ -370,7 +382,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5c02ea54-9f41-4582-8dc3-d33098db33f0",
+						"id": "c9055e71-f905-4f44-bea3-f0af3779ad70",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -386,7 +398,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d722bc67-def2-4384-a5f5-46436515377c",
+						"id": "626878db-61f1-4e2a-93e2-37ac8ff752dd",
 						"exec": [
 							"pm.collectionVariables.set(\"newLogin\", pm.variables.replaceIn('{{$randomUserName}}'));",
 							"pm.collectionVariables.set(\"newEmail\", pm.variables.replaceIn('{{$randomEmail}}'));"
@@ -408,16 +420,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/user",
+					"raw": "http://{{baseUrl}}/api/v1/users",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
-						"user"
+						"users"
 					]
 				}
 			},
@@ -429,28 +440,32 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f5844832-b665-4fb7-a56a-31c64f22d4a6",
+						"id": "c7eab9fd-d22e-48e5-a6f8-5a9290df9402",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
 							"var schema = {",
-							"    \"id\": {",
-							"        \"type\": \"string\"",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"username\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"email\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"firstName\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"lastName\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"phone\": {",
+							"            \"type\": \"string\"",
+							"        }",
 							"    },",
-							"    \"login\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"email\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"first_name\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"last_name\": {",
-							"        \"type\": \"string\"",
-							"    }",
+							"    \"required\": [\"phone\", \"username\", \"email\", \"firstName\", \"lastName\"]",
 							"};",
 							"",
 							"var jsonData = pm.response.json();",
@@ -480,87 +495,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/api/v1/users/{{userId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
 						"users",
 						"{{userId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get profile",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "64a9d937-a420-4b00-a120-b362cd7e213b",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"var schema = {",
-							"    \"id\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"login\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"email\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"first_name\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"last_name\": {",
-							"        \"type\": \"string\"",
-							"    }",
-							"};",
-							"",
-							"var jsonData = pm.response.json();",
-							"pm.test(\"Response schema is valid\", function () {",
-							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
-							"});",
-							"",
-							"pm.test(\"Data is valid\", function () {",
-							"    pm.expect(jsonData.first_name).to.eql(pm.variables.get(\"firstName\"));",
-							"    pm.expect(jsonData.last_name).to.eql(pm.variables.get(\"lastName\"));",
-							"    pm.expect(jsonData.login).to.eql(pm.variables.get(\"login\")); // this data is cached",
-							"    pm.expect(jsonData.email).to.eql(pm.variables.get(\"email\"));",
-							"});",
-							"",
-							"var responseJSON = JSON.parse(responseBody)",
-							"pm.collectionVariables.set(\"id\", jsonData.id);",
-							"",
-							"",
-							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
-							"tests[\"[INFO] Response: \" + responseBody] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{baseUrl}}/userinfo/info",
-					"protocol": "http",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"userinfo",
-						"info"
 					]
 				}
 			},
@@ -572,7 +516,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d914049c-7fb0-443e-9451-960e59b7d3ff",
+						"id": "b4b1849e-32cb-4e2e-a12a-e43fabe2cfb8",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -599,13 +543,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"raw": "http://{{baseUrl}}/logout",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"logout"
 					]
 				}
@@ -613,12 +556,12 @@
 			"response": []
 		},
 		{
-			"name": "Get profile error",
+			"name": "Get product error",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "04d64b55-5917-4327-ac73-6d05a7312c84",
+						"id": "4cc6ee46-a0a4-4dfa-92a0-5e424ab36eb5",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -635,14 +578,54 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/userinfo/info",
+					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"userinfo",
-						"info"
+						"api",
+						"v1",
+						"products",
+						"72eb9cf0-da7f-11ea-ab94-02420a200004"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read user error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "07a51245-9b95-4ea6-9f6a-6951cebb4a49",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{userId}}"
 					]
 				}
 			},
@@ -654,7 +637,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "50de6c28-d3a4-446e-9340-d76f7a3d4032",
+						"id": "6664afc9-440a-4604-8acf-515088ff43c7",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -684,7 +667,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d827ffcc-0b40-4303-a24e-39e0b6ebd82c",
+						"id": "65c7b6f0-691f-4d53-a67b-e9a7e4b92f5b",
 						"exec": [
 							"pm.collectionVariables.set(\"login2\", pm.variables.replaceIn('{{$randomUserName}}'));",
 							"pm.collectionVariables.set(\"password2\", pm.variables.replaceIn('{{$randomPassword}}'));",
@@ -710,16 +693,16 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/api/v1/users",
+					"raw": "http://{{baseUrl}}/api/v1/users/signup",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"api",
 						"v1",
-						"users"
+						"users",
+						"signup"
 					]
 				}
 			},
@@ -731,7 +714,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "69be5755-2577-498d-b959-077894ea088c",
+						"id": "8c9d4063-9781-4271-a2f3-1ccb7829d7ac",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -758,13 +741,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/login",
+					"raw": "http://{{baseUrl}}/login",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"login"
 					]
 				}
@@ -777,7 +759,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2046faf6-fd51-466c-8ce7-68ac71bc9253",
+						"id": "ed74cb69-655e-47f1-b5dd-00a1e0462e88",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -804,13 +786,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/api/v1/users/{{userId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
 						"users",
@@ -826,7 +807,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c9e9ed0b-1c76-4cd1-81ae-797d8308665f",
+						"id": "a1f97591-f6cf-4493-b17b-b91e16f7796e",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -844,13 +825,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId}}",
+					"raw": "http://{{baseUrl}}/api/v1/users/{{userId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
 						"users",
@@ -866,28 +846,33 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "67ba3c52-a603-42e0-acb8-13e01aff9cca",
+						"id": "1b1bc562-d4ab-4ba1-aee1-30ae77c2ca8c",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
+							"",
 							"var schema = {",
-							"    \"id\": {",
-							"        \"type\": \"string\"",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"username\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"email\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"firstName\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"lastName\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"phone\": {",
+							"            \"type\": \"string\"",
+							"        }",
 							"    },",
-							"    \"login\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"email\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"first_name\": {",
-							"        \"type\": \"string\"",
-							"    },",
-							"    \"last_name\": {",
-							"        \"type\": \"string\"",
-							"    }",
+							"    \"required\": [\"phone\", \"username\", \"email\", \"firstName\", \"lastName\"]",
 							"};",
 							"",
 							"var jsonData = pm.response.json();",
@@ -916,13 +901,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/user/api/v1/users/{{userId2}}",
+					"raw": "http://{{baseUrl}}/api/v1/users/{{userId2}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"user",
 						"api",
 						"v1",
 						"users",
@@ -938,7 +922,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8e50ba88-1a25-4182-9403-a8522680a4de",
+						"id": "bdf51f52-e18a-4691-8638-fcaeceb7250b",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -964,13 +948,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUrl}}/otusapp/logout",
+					"raw": "http://{{baseUrl}}/logout",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"otusapp",
 						"logout"
 					]
 				}
@@ -982,7 +965,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "20389290-a44e-44ff-b11e-460020372e97",
+				"id": "d47c387f-fbe6-4621-89a6-3480560d9245",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -992,7 +975,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "b184611b-0b89-407a-80a0-e3f5bb157bdb",
+				"id": "e39488fb-222d-40a7-9410-4505de8c6585",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -1002,112 +985,94 @@
 	],
 	"variable": [
 		{
-			"id": "6f87d5cb-d6a0-455e-9d27-46ea8484afde",
+			"id": "c8147b87-c17f-4671-a2a7-3b33e1ba6b83",
 			"key": "baseUrl",
-			"value": "arch.homework",
-			"type": "string"
+			"value": "arch.homework"
 		},
 		{
-			"id": "5ab26e45-c193-4b76-91db-be115b4e4105",
+			"id": "a0fdeed2-cdf0-42ba-8d4d-83a07ef88189",
 			"key": "userId",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "78be35c1-5cfd-4644-b8cd-40adb1507562",
+			"id": "244bef53-09d2-4223-9c03-c64338a59ef8",
 			"key": "login",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "14d7c7c2-c152-4585-95a8-60eba5ce3630",
+			"id": "5fcc4966-28fb-4c27-abcb-b1a8f1c42d6e",
 			"key": "email",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "f81d69b4-2df6-4cfe-98de-48ba2861262b",
+			"id": "eec4a6f6-deca-4edf-abff-0d82ad58df1d",
 			"key": "firstName",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "4c6bbd67-4663-498a-94e7-5ebb1885685b",
+			"id": "ecd9d9ce-8ee4-417b-be3c-74fc898dfa4f",
 			"key": "lastName",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "87b11805-415e-4477-b31e-941fbea1650f",
+			"id": "714e32a4-4e95-4406-8631-e02b0359a963",
 			"key": "password",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "3ff8a748-3394-4766-b16a-ea8419e9f654",
+			"id": "c9b715ce-ee43-4dee-b609-1d7e8e9cc583",
 			"key": "phone",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "7bf7b4d8-b9ae-4f4d-9624-a3a62dcdd254",
+			"id": "824e84df-593f-4b8b-83d2-648e13bf355a",
 			"key": "id",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "3c51ab30-afd5-4094-a00c-8e84ed97b3c9",
+			"id": "30b59bb7-b567-4cc0-8eed-765c07534c20",
 			"key": "newEmail",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "57b76767-65cc-4e53-ad2a-faa8c52cb925",
+			"id": "7ab62658-03be-4919-9cc2-826b590ff7ca",
 			"key": "newLogin",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "7b375be0-91ad-423a-8b1a-ed836053fd37",
+			"id": "d6735756-dec1-4254-a8a0-26fef71148b7",
 			"key": "email2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "8f2db78e-13e9-43f3-9aef-23aa15f5eace",
+			"id": "5d60d1f3-7eda-4239-82ef-905aa69b12da",
 			"key": "firstName2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "2ff5886a-929b-4b7e-a61f-0dd6bf976404",
+			"id": "949c6cad-bcec-42d9-b229-b0c71f82ac76",
 			"key": "lastName2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "33a53f7e-6745-42a6-a251-5fc7e43b7c8b",
+			"id": "7a71ecb5-a68f-465b-a747-52b16e466c85",
 			"key": "login2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "87c4022c-5b4b-498c-9ded-77e7cf585c70",
+			"id": "ccda7974-ec58-4720-8043-2d61d615af48",
 			"key": "password2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "e12a598b-ba3e-42b5-b1ad-afa6c645ddc0",
+			"id": "aa5b7fcb-077d-4987-bd62-f794e0427752",
 			"key": "phone2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
-			"id": "52d4190c-924d-4ebe-84d0-7e29593e3db4",
+			"id": "4a82d7ec-c5fb-4924-aabf-1ca2ed7f3f12",
 			"key": "userId2",
-			"value": "",
-			"type": "string"
+			"value": ""
 		}
 	],
 	"protocolProfileBehavior": {}

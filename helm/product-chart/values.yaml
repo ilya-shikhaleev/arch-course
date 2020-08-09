@@ -13,19 +13,31 @@ test:
 appPort: 8000
 configNames:
   port: PORT
+  postgresHost: POSTGRES_HOST
+  postgresPort: POSTGRES_PORT
+  postgresDbName: POSTGRES_DB
+  postgresUser: POSTGRES_USER
+  postgresPassword: POSTGRES_PASSWORD
 
 ingress:
   host: "arch.homework"
   enabled: true
-  paths: ["/userinfo"]
+  paths: ["/api/v1/products"]
   hosts: ["arch.homework"]
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: http,https
-    traefik.frontend.rule.type: PathPrefixStrip
+    #traefik.frontend.rule.type: PathPrefixStrip
     ingress.kubernetes.io/auth-type: forward
     ingress.kubernetes.io/auth-url: http://user-user-chart.arch-course.svc.cluster.local:9000/auth
     ingress.kubernetes.io/auth-response-headers: X-User-Id, X-Email, X-Login, X-First-Name, X-Last-Name
+
+postgresql:
+  postgresqlDatabase: arch-course-db
+  postgresqlUsername: arch-course
+  postgresqlPassword: passwd
+  service:
+    port: "5432"
 
 traefik:
   rbac:

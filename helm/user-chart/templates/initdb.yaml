@@ -43,11 +43,100 @@ spec:
                 );
                 INSERT INTO users (id, username, password, firstname, lastname, email, phone)
                 VALUES ('{{ .Values.test.user }}', 'johndoe567', '098f6bcd4621d373cade4e832627b4f6', 'John', 'Doe', 'bestjohn@doe.com', '+71002003040')
-                ON CONFLICT (id) DO UPDATE SET username  = EXCLUDED.username,
-                                             firstname = EXCLUDED.firstname,
-                                             lastname  = EXCLUDED.lastname,
-                                             email     = EXCLUDED.email,
-                                             phone     = EXCLUDED.phone;
+                ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username,
+                                             firstname  = EXCLUDED.firstname,
+                                             lastname   = EXCLUDED.lastname,
+                                             email      = EXCLUDED.email,
+                                             phone      = EXCLUDED.phone;
+                CREATE TABLE meta_products (
+                  id          varchar(36),
+                  title       varchar(255),
+                  description varchar(255),
+                  material    integer,
+                  CONSTRAINT meta_products_key PRIMARY KEY(id)
+                );
+                INSERT INTO meta_products (id, title, description, material)
+                VALUES (
+                          '2c801978-815c-11ea-a3d4-02420a200002',
+                          'Gopher',
+                          'This beautiful paper polygonal gopher will decorate your Go event, your office or your apartment. If you are a fan of the Go language, then you definitely need to have such a gopher.',
+                          1
+                        ), (
+                          'c752e5dd-da79-11ea-ab94-02420a200004',
+                          'Gopher',
+                          'This fullmetal polygonal gopher will decorate your Go event, your office or your apartment. If you are a fan of the Go language, then you definitely need to have such a gopher.',
+                          2
+                        ), (
+                          'db75861e-da7e-11ea-ab94-02420a200004',
+                          'Gopher',
+                          'This template of polygonal gopher will decorate your Go event, your office or your apartment. If you are a fan of the Go language, then you definitely need to have such a gopher.',
+                          3
+                        )
+                ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+                                               description = EXCLUDED.description,
+                                               material = EXCLUDED.material;
+                CREATE TABLE products (
+                  id              varchar(36),
+                  meta_product_id varchar(36),
+                  height          integer DEFAULT NULL,
+                  color           varchar(255) DEFAULT NULL,
+                  price           float,
+                  CONSTRAINT products_key PRIMARY KEY(id)
+                );
+                INSERT INTO products (id, meta_product_id, height, color, price)
+                VALUES (
+                          '72eb9cf0-da7f-11ea-ab94-02420a200004',
+                          '2c801978-815c-11ea-a3d4-02420a200002',
+                          35,
+                          'blue',
+                          10.0
+                        ), (
+                          '47a0810a-da7f-11ea-ab94-02420a200004',
+                          '2c801978-815c-11ea-a3d4-02420a200002',
+                          65,
+                          'blue',
+                          20.0
+                        ), (
+                          '4dd15bb6-da7f-11ea-ab94-02420a200004',
+                          '2c801978-815c-11ea-a3d4-02420a200002',
+                          35,
+                          'brown',
+                          9.99
+                        ),(
+                          'dcbf686f-da7f-11ea-ab94-02420a200004',
+                          '2c801978-815c-11ea-a3d4-02420a200002',
+                          65,
+                          'brown',
+                          20.0
+                        ), (
+                          '5711d9b6-da7f-11ea-ab94-02420a200004',
+                          'c752e5dd-da79-11ea-ab94-02420a200004',
+                          40,
+                          'metal',
+                          30.0
+                        ), (
+                          '6b1c1c3f-da7f-11ea-ab94-02420a200004',
+                          'c752e5dd-da79-11ea-ab94-02420a200004',
+                          60,
+                          'blue',
+                          40.0
+                        ), (
+                          '84104e38-da7f-11ea-ab94-02420a200004',
+                          'c752e5dd-da79-11ea-ab94-02420a200004',
+                          100,
+                          'blue',
+                          55.5
+                        ), (
+                          '7bc0687e-da7f-11ea-ab94-02420a200004',
+                          'db75861e-da7e-11ea-ab94-02420a200004',
+                          NULL,
+                          NULL,
+                          5.0
+                        )
+                ON CONFLICT (id) DO UPDATE SET meta_product_id = EXCLUDED.meta_product_id,
+                                               height = EXCLUDED.height,
+                                               color = EXCLUDED.color,
+                                               price = EXCLUDED.price;
               EOF
 
   backoffLimit: 5

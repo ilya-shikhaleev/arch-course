@@ -60,10 +60,10 @@ func MakeHandler(s *user.Service, logger httplog.Logger) http.Handler {
 		opts...,
 	)
 
-	r.Handle("/api/v1/users", createUserHandler).Methods(http.MethodPost)
+	r.Handle("/api/v1/users/signup", createUserHandler).Methods(http.MethodPost)
 	r.Handle("/api/v1/users/{id}", readUserHandler).Methods(http.MethodGet)
 	r.Handle("/api/v1/users/{id}", updateUserHandler).Methods(http.MethodPut)
-	r.Handle("/api/v1/user", updateUserHandler).Methods(http.MethodPut)
+	r.Handle("/api/v1/users", updateUserHandler).Methods(http.MethodPut)
 	r.Handle("/api/v1/users/{id}", deleteUserHandler).Methods(http.MethodDelete)
 
 	return r

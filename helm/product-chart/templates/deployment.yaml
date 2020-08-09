@@ -29,6 +29,31 @@ spec:
                 configMapKeyRef:
                   name: product-config
                   key: {{ .Values.configNames.port }}
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: {{ .Values.configNames.postgresHost }}
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: {{ .Values.configNames.postgresPort }}
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: {{ .Values.configNames.postgresDbName }}
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: product-config
+                  key: {{ .Values.configNames.postgresUser }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: product-secret
+                  key: {{ .Values.configNames.postgresPassword }}
 
           livenessProbe:
             httpGet:

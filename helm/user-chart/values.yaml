@@ -16,24 +16,23 @@ ingress:
   enabled: true
   hosts: ["arch.homework"]
   authenticated:
-    paths: ["/user"]
+    paths: ["/api/v1/users"]
     annotations:
       kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.entrypoints: http,https
-      traefik.frontend.rule.type: PathPrefixStrip
+      #traefik.frontend.rule.type: PathPrefixStrip
       ingress.kubernetes.io/auth-type: forward
       ingress.kubernetes.io/auth-url: http://user-user-chart.arch-course.svc.cluster.local:9000/auth
       ingress.kubernetes.io/auth-response-headers: X-User-Id, X-Email, X-Login, X-First-Name, X-Last-Name
   guest:
-    paths: ["/otusapp"]
+    paths: ["/login", "/logout", "/api/v1/users/signup"]
     annotations:
       kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.entrypoints: http,https
-      traefik.frontend.rule.type: PathPrefixStrip
 
 postgresql:
-  postgresqlDatabase: user-db
-  postgresqlUsername: user
+  postgresqlDatabase: arch-course-db
+  postgresqlUsername: arch-course
   postgresqlPassword: passwd
   service:
     port: "5432"
