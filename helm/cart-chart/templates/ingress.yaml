@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+{{- $serviceName := include "cart-chart.fullname" . -}}
+{{- $servicePort := .Values.service.port -}}
+{{- $paths := .Values.ingress.paths -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "cart-chart.fullname" . }}
+  labels:
+    {{- include "cart-chart.labels" . | nindent 4 }}
+{{- if .Values.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- if .Values.ingress.hosts }}
+  {{- range $host := .Values.ingress.hosts }}
+  - host: {{ $host }}
+    http:
+      paths:
+  {{- range $p := $paths }}
+      - path: {{ $p }}
+        backend:
+          serviceName: {{ $serviceName }}
+          servicePort: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- end -}}
+{{- end -}}

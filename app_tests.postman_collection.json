@@ -377,6 +377,168 @@
 			"response": []
 		},
 		{
+			"name": "Read Cart error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a3cd878-3512-40f1-910b-c3068f7d80ef",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/cart",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product to Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "88f0de35-de03-4638-bde6-9ac6be3e81d1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8a150d25-455a-44f2-b8ec-522f54ee6e39",
+						"exec": [
+							"pm.collectionVariables.set(\"newLogin\", pm.variables.replaceIn('{{$randomUserName}}'));",
+							"pm.collectionVariables.set(\"newEmail\", pm.variables.replaceIn('{{$randomEmail}}'));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"productID\": \"72eb9cf0-da7f-11ea-ab94-02420a200004\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/cart/product",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cart",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3fc1c596-5a8f-481e-b546-3bfffdd0d177",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"cartID\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"productIDs\": {",
+							"            \"type\": \"array\"",
+							"        },",
+							"    },",
+							"    \"required\": [\"cartID\", \"productIDs\"]",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.productIDs[0]).to.eql(\"72eb9cf0-da7f-11ea-ab94-02420a200004\");",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/cart",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Update user",
 			"event": [
 				{
@@ -985,92 +1147,92 @@
 	],
 	"variable": [
 		{
-			"id": "c8147b87-c17f-4671-a2a7-3b33e1ba6b83",
+			"id": "631a7e89-bddb-49a5-9edc-2f5db5a0e654",
 			"key": "baseUrl",
 			"value": "arch.homework"
 		},
 		{
-			"id": "a0fdeed2-cdf0-42ba-8d4d-83a07ef88189",
+			"id": "ec587129-4ca9-4622-80a0-67c1fbd8acbd",
 			"key": "userId",
 			"value": ""
 		},
 		{
-			"id": "244bef53-09d2-4223-9c03-c64338a59ef8",
+			"id": "d4ac73d8-bc62-4d33-8ab9-dccbf5d0a2a1",
 			"key": "login",
 			"value": ""
 		},
 		{
-			"id": "5fcc4966-28fb-4c27-abcb-b1a8f1c42d6e",
+			"id": "ec488617-a236-4d00-b928-68af2b7f70ff",
 			"key": "email",
 			"value": ""
 		},
 		{
-			"id": "eec4a6f6-deca-4edf-abff-0d82ad58df1d",
+			"id": "ff9e7682-178a-49ef-88f6-e3e8caba19cb",
 			"key": "firstName",
 			"value": ""
 		},
 		{
-			"id": "ecd9d9ce-8ee4-417b-be3c-74fc898dfa4f",
+			"id": "9f62fb29-a4f1-4ad4-a2fd-046d4fb3969c",
 			"key": "lastName",
 			"value": ""
 		},
 		{
-			"id": "714e32a4-4e95-4406-8631-e02b0359a963",
+			"id": "0facdb38-c545-4a95-a7bf-3868aa488a51",
 			"key": "password",
 			"value": ""
 		},
 		{
-			"id": "c9b715ce-ee43-4dee-b609-1d7e8e9cc583",
+			"id": "8166a643-4139-4d8e-932e-3766bb72079f",
 			"key": "phone",
 			"value": ""
 		},
 		{
-			"id": "824e84df-593f-4b8b-83d2-648e13bf355a",
+			"id": "293c6d3c-46b5-4d52-aa24-b8cd1afd3b5f",
 			"key": "id",
 			"value": ""
 		},
 		{
-			"id": "30b59bb7-b567-4cc0-8eed-765c07534c20",
+			"id": "f542e6c4-4aa8-4da5-a049-3942f1182331",
 			"key": "newEmail",
 			"value": ""
 		},
 		{
-			"id": "7ab62658-03be-4919-9cc2-826b590ff7ca",
+			"id": "7c78dafd-4937-4b4a-8140-489de1845751",
 			"key": "newLogin",
 			"value": ""
 		},
 		{
-			"id": "d6735756-dec1-4254-a8a0-26fef71148b7",
+			"id": "2c41f634-ba8d-4547-af0a-b8363cd16b5b",
 			"key": "email2",
 			"value": ""
 		},
 		{
-			"id": "5d60d1f3-7eda-4239-82ef-905aa69b12da",
+			"id": "07e8ad80-09e2-4bc5-b492-78e01ae68ef3",
 			"key": "firstName2",
 			"value": ""
 		},
 		{
-			"id": "949c6cad-bcec-42d9-b229-b0c71f82ac76",
+			"id": "bcb549a9-1f6d-480e-91a6-c16796a9f90d",
 			"key": "lastName2",
 			"value": ""
 		},
 		{
-			"id": "7a71ecb5-a68f-465b-a747-52b16e466c85",
+			"id": "e6533292-bf0c-45e8-a7ea-557add149fd3",
 			"key": "login2",
 			"value": ""
 		},
 		{
-			"id": "ccda7974-ec58-4720-8043-2d61d615af48",
+			"id": "de15487a-dbf4-42f4-9d05-67ab7da8a1a0",
 			"key": "password2",
 			"value": ""
 		},
 		{
-			"id": "aa5b7fcb-077d-4987-bd62-f794e0427752",
+			"id": "c163907b-f537-4327-8f73-859e0f084fc7",
 			"key": "phone2",
 			"value": ""
 		},
 		{
-			"id": "4a82d7ec-c5fb-4924-aabf-1ca2ed7f3f12",
+			"id": "f2b027dd-ec5e-4a5d-912f-5a8e47c5c76c",
 			"key": "userId2",
 			"value": ""
 		}

@@ -137,6 +137,15 @@ spec:
                                                height = EXCLUDED.height,
                                                color = EXCLUDED.color,
                                                price = EXCLUDED.price;
+                CREATE TABLE carts (
+                  id              varchar(36),
+                  user_id         varchar(36),
+                  CONSTRAINT carts_key PRIMARY KEY(id)
+                );
+                CREATE TABLE carts_products (
+                  cart_id            varchar(36),
+                  product_id         varchar(36)
+                );
               EOF
 
   backoffLimit: 5
