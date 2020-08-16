@@ -1,0 +1,57 @@
+replicaCount: 1
+
+image:
+  repository: ilyashikhaleev/arch-course-popular
+
+service:
+  type: NodePort
+  port: 9000
+
+test:
+  user: 2c801978-815c-11ea-a3d4-02420a200002
+
+appPort: 8000
+configNames:
+  port: PORT
+  postgresHost: POSTGRES_HOST
+  postgresPort: POSTGRES_PORT
+  postgresDbName: POSTGRES_DB
+  postgresUser: POSTGRES_USER
+  postgresPassword: POSTGRES_PASSWORD
+
+ingress:
+  host: "arch.homework"
+  enabled: true
+  paths: ["/api/v1/popular"]
+  hosts: ["arch.homework"]
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: http,https
+
+postgresql:
+  postgresqlDatabase: arch-course-db
+  postgresqlUsername: arch-course
+  postgresqlPassword: passwd
+  service:
+    port: "5432"
+
+traefik:
+  rbac:
+    enabled: true
+  accessLogs:
+    enabled: true
+  metrics:
+    prometheus:
+      enabled: false
+    serviceMonitor:
+      enabled: false
+  ssl:
+    enabled: false
+  deployment:
+    hostPort:
+      httpEnabled: true
+      httpPort: 8087
+      httpsEnabled: false
+  serviceType: NodePort
+  debug:
+    enabled: true

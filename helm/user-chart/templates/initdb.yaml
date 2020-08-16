@@ -157,6 +157,17 @@ spec:
                   product_id varchar(36),
                   price      float
                 );
+                CREATE TABLE popular (
+                  product_id  varchar(36),
+                  title       varchar(255),
+                  description varchar(255),
+                  material    varchar(255),
+                  height      integer DEFAULT NULL,
+                  color       varchar(255) DEFAULT NULL,
+                  price       float,
+                  buy_count   integer,
+                  CONSTRAINT  popular_key PRIMARY KEY(product_id)
+                );
               EOF
 
   backoffLimit: 5

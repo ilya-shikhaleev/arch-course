@@ -1,9 +1,15 @@
 package transport
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
+	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/pkg/errors"
 
 	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
 )
@@ -88,12 +94,37 @@ type payOrderRequest struct {
 type payOrderResponse struct {
 }
 
-func makePayOrderEndpoint(service *order.Service) endpoint.Endpoint {
+func makePayOrderEndpoint(service *order.Service, repo order.Repository) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(payOrderRequest)
 		if err := service.PayOrder(req.OrderID); err != nil {
-			return createOrderResponse{}, err
+			return createOrderResponse{}, errors.WithStack(err)
 		} else {
+			const cartHost = "http://popular-popular-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
+			var params struct {
+				ProductIDs []string `json:"productIDs"`
+			}
+
+			o, err := repo.FindByID(order.ID(req.OrderID))
+			if err != nil {
+				return createOrderResponse{}, nil
+			}
+			var productIDs []string
+			for _, p := range o.Products {
+				productIDs = append(productIDs, p.ProductID)
+			}
+
+			params.ProductIDs = productIDs
+			paramsBytes, err := json.Marshal(params)
+			if err != nil {
+				return createOrderResponse{}, nil
+			}
+
+			_ = backoff.Retry(func() error {
+				_, err := http.Post(cartHost+"/api/v1/internal/popular/buy", "application/json; charset=UTF-8", bytes.NewReader(paramsBytes))
+				return errors.WithStack(err)
+			}, backoff.WithMaxRetries(backoff.NewConstantBackOff(time.Second), 3))
+
 			return createOrderResponse{}, nil
 		}
 	}

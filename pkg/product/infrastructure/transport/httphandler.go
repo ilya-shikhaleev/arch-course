@@ -28,7 +28,16 @@ func MakeHandler(repo product.Repository, logger httplog.Logger) http.Handler {
 		opts...,
 	)
 
+	readProductsHandler := httptransport.NewServer(
+		makeReadProductsEndpoint(repo),
+		decodeReadProductsRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r.Handle("/api/v1/products/{id}", readProductHandler).Methods(http.MethodGet)
+	r.Handle("/api/v1/internal/products/{id}", readProductHandler).Methods(http.MethodGet)
+	r.Handle("/api/v1/products", readProductsHandler).Methods(http.MethodGet)
 
 	return r
 }
@@ -40,11 +49,18 @@ func decodeReadProductRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, newErrInvalidRequest(nil, "id required for read product request")
 	}
 
-	// TODO: we can check user rights if r.Header.Get("X-User-Id") != id {
-	// 	return nil, newErrUnauthorized(fmt.Sprintf("can read only self user data (%s != %s)", id, r.Header.Get("X-User-Id")))
-	// }
-
 	req := readProductRequest{ID: id}
+	return req, nil
+}
+
+func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var body struct {
+		Search string `json:"search,omitempty"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return nil, newErrInvalidRequest(err, "invalid add product request")
+	}
+	req := readProductsRequest{Search: body.Search}
 	return req, nil
 }
 

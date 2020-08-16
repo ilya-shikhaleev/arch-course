@@ -295,6 +295,109 @@
 			"response": []
 		},
 		{
+			"name": "Search product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5c3fc826-c86b-421e-9d66-c6d6bebc74f3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\":\"object\",",
+							"    \"properties\": {",
+							"        \"products\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"                \"properties\": {",
+							"                    \"productID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"metaProductID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"title\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"description\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"material\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"price\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"height\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"color\": {",
+							"                        \"type\": \"string\"",
+							"                    }",
+							"                },",
+							"                \"required\": [\"metaProductID\", \"title\", \"description\", \"material\", \"price\"]   ",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
+							"    pm.expect(jsonData.products.length > 0).to.eql(true);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"productId\", jsonData.products[0].productID);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"search\": \"Go\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get product",
 			"event": [
 				{
@@ -339,12 +442,6 @@
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
 							"});",
 							"",
-							"pm.test(\"Data is valid\", function () {",
-							"    pm.expect(jsonData.title).to.eql(\"Gopher\");",
-							"    pm.expect(jsonData.price).to.eql(10);",
-							"    pm.expect(jsonData.height).to.eql(35);",
-							"});",
-							"",
 							"var responseJSON = JSON.parse(responseBody)",
 							"pm.collectionVariables.set(\"id\", jsonData.id);",
 							"",
@@ -361,7 +458,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
+					"raw": "http://{{baseUrl}}/api/v1/products/{{productId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
@@ -370,7 +467,7 @@
 						"api",
 						"v1",
 						"products",
-						"72eb9cf0-da7f-11ea-ab94-02420a200004"
+						"{{productId}}"
 					]
 				}
 			},
@@ -451,7 +548,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"productID\": \"72eb9cf0-da7f-11ea-ab94-02420a200004\"\n}",
+					"raw": "{\n  \"productID\": \"{{productId}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -505,7 +602,7 @@
 							"});",
 							"",
 							"pm.test(\"Data is valid\", function () {",
-							"    pm.expect(jsonData.productIDs[0]).to.eql(\"72eb9cf0-da7f-11ea-ab94-02420a200004\");",
+							"    pm.expect(jsonData.productIDs[0]).to.eql(pm.variables.get(\"productId\"));",
 							"});",
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
@@ -986,6 +1083,106 @@
 						"api",
 						"v1",
 						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read popular products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "83d01d60-44bc-47bd-bf0b-e382746e1985",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\":\"object\",",
+							"    \"properties\": {",
+							"        \"products\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"                \"properties\": {",
+							"                    \"productID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"title\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"description\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"material\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"price\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"height\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"color\": {",
+							"                        \"type\": \"string\"",
+							"                    }",
+							"                },",
+							"                \"required\": [\"productID\", \"title\", \"description\", \"material\", \"price\"]   ",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
+							"    pm.expect(jsonData.products.length > 0).to.eql(true);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"productId\", jsonData.products[0].productID);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"count\": 6\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/popular",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"popular"
 					]
 				}
 			},
@@ -1600,98 +1797,103 @@
 	],
 	"variable": [
 		{
-			"id": "5bc3cf13-93a3-49aa-862b-9eab2c7552ef",
+			"id": "035d5522-7b8a-4161-8ee0-f06237b5030c",
 			"key": "baseUrl",
 			"value": "arch.homework"
 		},
 		{
-			"id": "79617200-f5bb-4f91-bda8-16955ad153d6",
+			"id": "e2f076c6-58fb-42c8-96a1-a3b5e2e5e41c",
 			"key": "userId",
 			"value": ""
 		},
 		{
-			"id": "fdd5e0b0-43e4-4812-8be5-8ea17a26e04f",
+			"id": "816ac82f-3986-42f9-9abf-00c4aee8eb3d",
 			"key": "login",
 			"value": ""
 		},
 		{
-			"id": "981e2536-13ff-4b31-8431-59ccbd64aca7",
+			"id": "ff5cf1d4-dc34-4317-b491-46af87e5c981",
 			"key": "email",
 			"value": ""
 		},
 		{
-			"id": "889a20df-418a-471c-a95d-e5c0d64d0b88",
+			"id": "69a898d7-6b86-4b42-930b-b4be499e8d05",
 			"key": "firstName",
 			"value": ""
 		},
 		{
-			"id": "2c7acffd-2b8a-4ca7-86d0-615678f438ee",
+			"id": "befc675a-f45c-4315-b57b-aa4e22ba3322",
 			"key": "lastName",
 			"value": ""
 		},
 		{
-			"id": "f7a8c1e1-ed11-4fec-98ec-bad3fd98dfdc",
+			"id": "96078472-fbc4-4919-8d1b-f44d010aa591",
 			"key": "password",
 			"value": ""
 		},
 		{
-			"id": "73410635-a90c-4461-b318-8fbe2db08dea",
+			"id": "26b643d6-ed70-4a6d-8557-4ca364afa0ac",
 			"key": "phone",
 			"value": ""
 		},
 		{
-			"id": "c92c92a1-c1e3-4efb-a062-aa34330f668d",
+			"id": "9b4012e5-1833-4fe7-bbfa-6a6c5b7fb86c",
 			"key": "id",
 			"value": ""
 		},
 		{
-			"id": "b3ec43f8-7085-4f3a-9269-69fc94d44d6c",
+			"id": "f017c7ae-955e-442e-b808-115692945989",
 			"key": "newEmail",
 			"value": ""
 		},
 		{
-			"id": "188a8b90-42b1-4fbb-9648-792385d3ac8e",
+			"id": "94a7b7e3-f50c-4329-8451-c2e930bdfdf1",
 			"key": "newLogin",
 			"value": ""
 		},
 		{
-			"id": "c869a317-5a11-436d-a383-0bd8bff0cd15",
+			"id": "d946dceb-66e7-4158-99c2-1ad0d03d0a49",
 			"key": "email2",
 			"value": ""
 		},
 		{
-			"id": "5e1afe5c-c0df-4dc6-b48f-b9026e84d71f",
+			"id": "7044558c-ba45-470a-9184-cff572909c24",
 			"key": "firstName2",
 			"value": ""
 		},
 		{
-			"id": "c1ad1e1d-6006-4d76-9b02-4995b9079783",
+			"id": "0bb6b512-5f2d-432b-b0e8-2ec32b0e9e3a",
 			"key": "lastName2",
 			"value": ""
 		},
 		{
-			"id": "8ee733fc-415b-4221-bc65-122ead019a1b",
+			"id": "6bfb5507-d1a3-4b56-8144-14f7bff1ce07",
 			"key": "login2",
 			"value": ""
 		},
 		{
-			"id": "c5f7537d-2493-42ba-afdc-cc4259291618",
+			"id": "01fede14-9e84-4dbe-8725-c4f628269ad6",
 			"key": "password2",
 			"value": ""
 		},
 		{
-			"id": "f5eb9825-8e7a-4135-b80a-a279686e198b",
+			"id": "3cc071f8-fd6c-4e81-96f3-b5c3ad8e209d",
 			"key": "phone2",
 			"value": ""
 		},
 		{
-			"id": "d8bc3eec-302e-4422-9c49-0a82a35e675f",
+			"id": "7ae34858-766f-4992-9904-443f6f883e2d",
 			"key": "userId2",
 			"value": ""
 		},
 		{
-			"id": "0b2cf86d-e1b2-461b-b87d-b74e0b7910b5",
+			"id": "88dff7b3-0831-455a-8db4-c0e358af09e8",
 			"key": "orderId",
+			"value": ""
+		},
+		{
+			"id": "788268cc-1d2d-4845-848f-241116947cb1",
+			"key": "productId",
 			"value": ""
 		}
 	],

@@ -10,6 +10,12 @@ PRODUCT_PORT?=8000
 PRODUCT_RELEASE?=0.0.1
 PRODUCT_HELM_RELEASE_NAME?=product
 
+POPULAR_APP?=popular
+POPULAR_DOCKERHUB?=ilyashikhaleev/arch-course-popular
+POPULAR_PORT?=8000
+POPULAR_RELEASE?=0.0.1
+POPULAR_HELM_RELEASE_NAME?=popular
+
 CART_APP?=cart
 CART_DOCKERHUB?=ilyashikhaleev/arch-course-cart
 CART_PORT?=8000
@@ -36,10 +42,11 @@ clean:
 	rm -f ./bin/${CART_APP} ; \
 	rm -f ./bin/${ORDER_APP} ; \
 	rm -f ./bin/${PAYMENT_APP} ; \
+	rm -f ./bin/${POPULAR_APP} ; \
 	rm -f ./bin/${PRODUCT_APP}
 
 .PHONY: build
-build: clean build-user build-product build-cart build-order build-payment
+build: clean build-user build-product build-cart build-order build-payment build-popular
 
 .PHONY: build-user
 build-user: clean
@@ -48,6 +55,10 @@ build-user: clean
 .PHONY: build-product
 build-product: clean
 	docker build -t $(PRODUCT_DOCKERHUB):$(PRODUCT_RELEASE) -f Product.Dockerfile .
+
+.PHONY: build-popular
+build-popular: clean
+	docker build -t $(POPULAR_DOCKERHUB):$(POPULAR_RELEASE) -f Popular.Dockerfile .
 
 .PHONY: build-cart
 build-cart: clean
@@ -63,10 +74,10 @@ build-payment: clean
 
 # helm
 .PHONY: start
-start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart update-helm-dependency-order run-order update-helm-dependency-payment run-payment
+start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart update-helm-dependency-order run-order update-helm-dependency-payment run-payment update-helm-dependency-popular run-popular
 
 .PHONY: run
-run: run-user run-product run-cart run-order run-payment
+run: run-user run-product run-cart run-order run-payment run-popular
 
 .PHONY: run-user
 run-user:
@@ -85,6 +96,15 @@ run-product:
 .PHONY: update-helm-dependency-product
 update-helm-dependency-product:
 	helm dependency update ./helm/product-chart
+
+.PHONY: run-popular
+run-popular:
+	helm uninstall $(POPULAR_HELM_RELEASE_NAME) ; \
+	helm install $(POPULAR_HELM_RELEASE_NAME) ./helm/popular-chart
+
+.PHONY: update-helm-dependency-popular
+update-helm-dependency-popular:
+	helm dependency update ./helm/popular-chart
 
 .PHONY: run-cart
 run-cart:

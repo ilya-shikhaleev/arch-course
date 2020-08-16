@@ -3,7 +3,6 @@ package transport
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	httplog "github.com/go-kit/kit/log"
@@ -12,76 +11,60 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
+	"github.com/ilya-shikhaleev/arch-course/pkg/popular/app/popular"
 )
 
-func MakeHandler(service *order.Service, repo order.Repository, logger httplog.Logger) http.Handler {
+func MakeHandler(repo popular.Repository, logger httplog.Logger) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	readOrderHandler := httptransport.NewServer(
-		makeReadOrdersEndpoint(repo),
-		decodeReadOrdersRequest,
+	readProductsHandler := httptransport.NewServer(
+		makeReadProductsEndpoint(repo),
+		decodeReadProductsRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	payOrderHandler := httptransport.NewServer(
-		makePayOrderEndpoint(service, repo),
-		decodePayOrderRequest,
+	onBuyProductsHandler := httptransport.NewServer(
+		makeOnBuyProductsEndpoint(repo),
+		decodeOnBuyProductsRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	createOrderHandler := httptransport.NewServer(
-		makeCreateOrderEndpoint(service),
-		decodeCreateOrderRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	r.Handle("/api/v1/orders", readOrderHandler).Methods(http.MethodGet)
-	r.Handle("/api/v1/internal/orders/{id}", payOrderHandler).Methods(http.MethodPatch)
-	r.Handle("/api/v1/orders", createOrderHandler).Methods(http.MethodPost)
+	r.Handle("/api/v1/popular", readProductsHandler).Methods(http.MethodGet)
+	r.Handle("/api/v1/internal/popular/buy", onBuyProductsHandler).Methods(http.MethodPost)
 
 	return r
 }
 
-func decodeReadOrdersRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
+func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var body struct {
+		Count int `json:"count,omitempty"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return nil, newErrInvalidRequest(err, "invalid add product request")
 	}
 
-	req := readOrdersRequest{UserID: userID}
+	count := 6 // default value
+	if body.Count > 0 {
+		count = body.Count
+	}
+	req := readProductsRequest{Count: count}
 	return req, nil
 }
 
-func decodePayOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
+func decodeOnBuyProductsRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var body struct {
+		ProductIDs []string `json:"productIDs,omitempty"`
 	}
-
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, newErrInvalidRequest(nil, "id required for pay order request")
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return nil, newErrInvalidRequest(err, "invalid add product request")
 	}
-
-	req := payOrderRequest{OrderID: id}
-	return req, nil
-}
-
-func decodeCreateOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
-	}
-	req := createOrderRequest{UserID: userID}
+	req := onBuyProductsRequest{ProductIDs: body.ProductIDs}
 	return req, nil
 }
 
@@ -106,10 +89,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		err = errors.New(unauthorizedErr.message)
 	} else {
 		switch err {
-		case order.ErrOrderNotFound:
+		case popular.ErrProductNotFound:
 			w.WriteHeader(http.StatusNotFound)
-		case order.ErrEmptyCart:
-			w.WriteHeader(http.StatusBadRequest)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
 		}

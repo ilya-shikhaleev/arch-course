@@ -25,14 +25,11 @@ type Product struct {
 
 type Repository interface {
 	FindByID(id ID) (*Product, error)
-	FindBySpecification(specification Specification) ([]*Product, error)
+	FindBySpecification(specification Specification) ([]Product, error)
 }
 
 type Specification struct {
 	SearchString string
-	Material     Material
-	PriceFrom    float32
-	PriceTo      float32
 }
 
 var ErrProductNotFound = errors.New("product not found")
