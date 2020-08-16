@@ -16,16 +16,23 @@ CART_PORT?=8000
 CART_RELEASE?=0.0.1
 CART_HELM_RELEASE_NAME?=cart
 
+ORDER_APP?=order
+ORDER_DOCKERHUB?=ilyashikhaleev/arch-course-order
+ORDER_PORT?=8000
+ORDER_RELEASE?=0.0.1
+ORDER_HELM_RELEASE_NAME?=order
+
 all: build
 
 .PHONY: clean
 clean:
 	rm -f ./bin/${USER_APP} ; \
 	rm -f ./bin/${CART_APP} ; \
+	rm -f ./bin/${ORDER_APP} ; \
 	rm -f ./bin/${PRODUCT_APP}
 
 .PHONY: build
-build: clean build-user build-product build-cart
+build: clean build-user build-product build-cart build-order
 
 .PHONY: build-user
 build-user: clean
@@ -39,12 +46,16 @@ build-product: clean
 build-cart: clean
 	docker build -t $(CART_DOCKERHUB):$(CART_RELEASE) -f Cart.Dockerfile .
 
+.PHONY: build-order
+build-order: clean
+	docker build -t $(ORDER_DOCKERHUB):$(ORDER_RELEASE) -f Order.Dockerfile .
+
 # helm
 .PHONY: start
-start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart
+start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart update-helm-dependency-order run-order
 
 .PHONY: run
-run: run-user run-product run-cart
+run: run-user run-product run-cart run-order
 
 .PHONY: run-user
 run-user:
@@ -72,6 +83,15 @@ run-cart:
 .PHONY: update-helm-dependency-cart
 update-helm-dependency-cart:
 	helm dependency update ./helm/cart-chart
+
+.PHONY: run-order
+run-order:
+	helm uninstall $(ORDER_HELM_RELEASE_NAME) ; \
+	helm install $(ORDER_HELM_RELEASE_NAME) ./helm/order-chart
+
+.PHONY: update-helm-dependency-order
+update-helm-dependency-order:
+	helm dependency update ./helm/order-chart
 
 # stresstest
 .PHONY: run-stresstest

@@ -24,6 +24,11 @@ func (repo *repository) Store(cart *cart.Cart) error {
 		ON CONFLICT (id) DO UPDATE SET user_id  = EXCLUDED.user_id;
 `
 	_, err := repo.db.Exec(sqlStatement, string(cart.ID), cart.UserID)
+	if err != nil {
+		return err
+	}
+
+	_, err = repo.db.Exec("DELETE FROM carts_products WHERE cart_id = $1;", string(cart.ID))
 	if err == nil {
 		for _, productID := range cart.ProductIDs {
 			sqlStatement := `

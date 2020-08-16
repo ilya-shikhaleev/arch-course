@@ -26,3 +26,12 @@ func (s *Service) AddProductToCart(userID, productID string) (err error) {
 
 	return s.repo.Store(c)
 }
+
+func (s *Service) ClearCart(userID string) (err error) {
+	c, err := s.repo.FindByUserID(userID)
+	if err != nil {
+		return err
+	}
+	c.ProductIDs = []string{}
+	return s.repo.Store(c)
+}

@@ -12,79 +12,52 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
-	"github.com/ilya-shikhaleev/arch-course/pkg/cart/app/cart"
+	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
 )
 
-func MakeHandler(service *cart.Service, repo cart.Repository, logger httplog.Logger) http.Handler {
+func MakeHandler(service *order.Service, repo order.Repository, logger httplog.Logger) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	readCartHandler := httptransport.NewServer(
-		makeReadCartEndpoint(repo),
-		decodeReadCartRequest,
+	readOrderHandler := httptransport.NewServer(
+		makeReadOrdersEndpoint(repo),
+		decodeReadOrdersRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	clearCartHandler := httptransport.NewServer(
-		makeClearCartEndpoint(service),
-		decodeClearCartRequest,
+	createOrderHandler := httptransport.NewServer(
+		makeCreateOrderEndpoint(service),
+		decodeCreateOrderRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	addProductToCartHandler := httptransport.NewServer(
-		makeAddProductToCartEndpoint(service),
-		decodeAddProductToCartRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	r.Handle("/api/v1/cart", readCartHandler).Methods(http.MethodGet)
-	r.Handle("/api/v1/cart", clearCartHandler).Methods(http.MethodDelete)
-	r.Handle("/api/v1/cart/product", addProductToCartHandler).Methods(http.MethodPut)
+	r.Handle("/api/v1/orders", readOrderHandler).Methods(http.MethodGet)
+	r.Handle("/api/v1/orders", createOrderHandler).Methods(http.MethodPost)
 
 	return r
 }
 
-func decodeReadCartRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeReadOrdersRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	userID := r.Header.Get("X-User-Id")
 	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user cart (%s)", r.Header.Get("X-User-Id")))
+		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
 	}
 
-	req := readCartRequest{UserID: userID}
+	req := readOrdersRequest{UserID: userID}
 	return req, nil
 }
 
-func decodeClearCartRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCreateOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	userID := r.Header.Get("X-User-Id")
 	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user cart (%s)", r.Header.Get("X-User-Id")))
+		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
 	}
-
-	req := clearCartRequest{UserID: userID}
-	return req, nil
-}
-
-type addProductToCartRequestBody struct {
-	ProductID string `json:"productID"`
-}
-
-func decodeAddProductToCartRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user cart (%s)", r.Header.Get("X-User-Id")))
-	}
-
-	var body addProductToCartRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, newErrInvalidRequest(err, "invalid add product request")
-	}
-	req := addProductToCartRequest{UserID: userID, ProductID: body.ProductID}
+	req := createOrderRequest{UserID: userID}
 	return req, nil
 }
 
@@ -109,7 +82,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		err = errors.New(unauthorizedErr.message)
 	} else {
 		switch err {
-		case cart.ErrCartNotFound:
+		case order.ErrOrderNotFound:
 			w.WriteHeader(http.StatusNotFound)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)

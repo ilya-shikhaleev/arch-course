@@ -146,6 +146,17 @@ spec:
                   cart_id            varchar(36),
                   product_id         varchar(36)
                 );
+                CREATE TABLE orders (
+                  id              varchar(36),
+                  user_id         varchar(36),
+                  status          integer,
+                  CONSTRAINT orders_key PRIMARY KEY(id)
+                );
+                CREATE TABLE orders_products (
+                  order_id   varchar(36),
+                  product_id varchar(36),
+                  price      float
+                );
               EOF
 
   backoffLimit: 5

@@ -49,3 +49,21 @@ func makeAddProductToCartEndpoint(service *cart.Service) endpoint.Endpoint {
 		}
 	}
 }
+
+type clearCartRequest struct {
+	UserID string
+}
+
+type clearCartResponse struct {
+}
+
+func makeClearCartEndpoint(service *cart.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(clearCartRequest)
+		if err := service.ClearCart(req.UserID); err != nil {
+			return clearCartResponse{}, err
+		} else {
+			return clearCartResponse{}, nil
+		}
+	}
+}
