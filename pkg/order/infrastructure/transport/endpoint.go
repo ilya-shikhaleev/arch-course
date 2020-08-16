@@ -80,3 +80,21 @@ func makeCreateOrderEndpoint(service *order.Service) endpoint.Endpoint {
 		}
 	}
 }
+
+type payOrderRequest struct {
+	OrderID string
+}
+
+type payOrderResponse struct {
+}
+
+func makePayOrderEndpoint(service *order.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(payOrderRequest)
+		if err := service.PayOrder(req.OrderID); err != nil {
+			return createOrderResponse{}, err
+		} else {
+			return createOrderResponse{}, nil
+		}
+	}
+}

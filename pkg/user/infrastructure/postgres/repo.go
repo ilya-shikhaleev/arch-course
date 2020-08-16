@@ -47,7 +47,7 @@ func (repo *userRepository) Find(id user.ID) (*user.User, error) {
 func (repo *userRepository) FindByUsername(username string) (*user.User, error) {
 	sqlStatement := `SELECT id, username, firstname, lastname, email, phone, password FROM users WHERE username=$1;`
 	var u user.User
-	row := repo.db.QueryRow(sqlStatement, string(username))
+	row := repo.db.QueryRow(sqlStatement, username)
 	switch err := row.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.Email, &u.Phone, &u.EncodedPass); err {
 	case sql.ErrNoRows:
 		return nil, user.ErrUserNotFound

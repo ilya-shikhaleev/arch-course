@@ -22,6 +22,12 @@ ORDER_PORT?=8000
 ORDER_RELEASE?=0.0.1
 ORDER_HELM_RELEASE_NAME?=order
 
+PAYMENT_APP?=payment
+PAYMENT_DOCKERHUB?=ilyashikhaleev/arch-course-payment
+PAYMENT_PORT?=8000
+PAYMENT_RELEASE?=0.0.1
+PAYMENT_HELM_RELEASE_NAME?=payment
+
 all: build
 
 .PHONY: clean
@@ -29,10 +35,11 @@ clean:
 	rm -f ./bin/${USER_APP} ; \
 	rm -f ./bin/${CART_APP} ; \
 	rm -f ./bin/${ORDER_APP} ; \
+	rm -f ./bin/${PAYMENT_APP} ; \
 	rm -f ./bin/${PRODUCT_APP}
 
 .PHONY: build
-build: clean build-user build-product build-cart build-order
+build: clean build-user build-product build-cart build-order build-payment
 
 .PHONY: build-user
 build-user: clean
@@ -50,12 +57,16 @@ build-cart: clean
 build-order: clean
 	docker build -t $(ORDER_DOCKERHUB):$(ORDER_RELEASE) -f Order.Dockerfile .
 
+.PHONY: build-payment
+build-payment: clean
+	docker build -t $(PAYMENT_DOCKERHUB):$(PAYMENT_RELEASE) -f Payment.Dockerfile .
+
 # helm
 .PHONY: start
-start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart update-helm-dependency-order run-order
+start: update-helm-dependency-user run-user update-helm-dependency-product run-product update-helm-dependency-cart run-cart update-helm-dependency-order run-order update-helm-dependency-payment run-payment
 
 .PHONY: run
-run: run-user run-product run-cart run-order
+run: run-user run-product run-cart run-order run-payment
 
 .PHONY: run-user
 run-user:
@@ -92,6 +103,15 @@ run-order:
 .PHONY: update-helm-dependency-order
 update-helm-dependency-order:
 	helm dependency update ./helm/order-chart
+
+.PHONY: run-payment
+run-payment:
+	helm uninstall $(PAYMENT_HELM_RELEASE_NAME) ; \
+	helm install $(PAYMENT_HELM_RELEASE_NAME) ./helm/payment-chart
+
+.PHONY: update-helm-dependency-payment
+update-helm-dependency-payment:
+	helm dependency update ./helm/payment-chart
 
 # stresstest
 .PHONY: run-stresstest

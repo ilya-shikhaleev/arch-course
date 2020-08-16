@@ -24,6 +24,11 @@ func (repo *repository) Store(order *order.Order) error {
 		ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, status = EXCLUDED.status;
 `
 	_, err := repo.db.Exec(sqlStatement, string(order.ID), order.UserID, order.Status)
+	if err != nil {
+		return err
+	}
+
+	_, err = repo.db.Exec("DELETE FROM orders_products WHERE order_id = $1;", string(order.ID))
 	if err == nil {
 		for _, product := range order.Products {
 			sqlStatement := `

@@ -11,53 +11,25 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-
-	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
 )
 
-func MakeHandler(service *order.Service, repo order.Repository, logger httplog.Logger) http.Handler {
+func MakeHandler(logger httplog.Logger) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	readOrderHandler := httptransport.NewServer(
-		makeReadOrdersEndpoint(repo),
-		decodeReadOrdersRequest,
-		encodeResponse,
-		opts...,
-	)
-
 	payOrderHandler := httptransport.NewServer(
-		makePayOrderEndpoint(service),
+		makePayOrderEndpoint(),
 		decodePayOrderRequest,
 		encodeResponse,
 		opts...,
 	)
 
-	createOrderHandler := httptransport.NewServer(
-		makeCreateOrderEndpoint(service),
-		decodeCreateOrderRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	r.Handle("/api/v1/orders", readOrderHandler).Methods(http.MethodGet)
-	r.Handle("/api/v1/internal/orders/{id}", payOrderHandler).Methods(http.MethodPatch)
-	r.Handle("/api/v1/orders", createOrderHandler).Methods(http.MethodPost)
+	r.Handle("/api/v1/payment", payOrderHandler).Methods(http.MethodPost)
 
 	return r
-}
-
-func decodeReadOrdersRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
-	}
-
-	req := readOrdersRequest{UserID: userID}
-	return req, nil
 }
 
 func decodePayOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -66,22 +38,14 @@ func decodePayOrderRequest(_ context.Context, r *http.Request) (interface{}, err
 		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
 	}
 
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, newErrInvalidRequest(nil, "id required for pay order request")
+	var body struct {
+		OrderID string `json:"orderID"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return nil, newErrInvalidRequest(err, "invalid pay order request")
 	}
 
-	req := payOrderRequest{OrderID: id}
-	return req, nil
-}
-
-func decodeCreateOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
-		return nil, newErrUnauthorized(fmt.Sprintf("can read only self user order (%s)", r.Header.Get("X-User-Id")))
-	}
-	req := createOrderRequest{UserID: userID}
+	req := payOrderRequest{UserID: userID, OrderID: body.OrderID}
 	return req, nil
 }
 
@@ -105,14 +69,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusUnauthorized)
 		err = errors.New(unauthorizedErr.message)
 	} else {
-		switch err {
-		case order.ErrOrderNotFound:
-			w.WriteHeader(http.StatusNotFound)
-		case order.ErrEmptyCart:
-			w.WriteHeader(http.StatusBadRequest)
-		default:
-			w.WriteHeader(http.StatusInternalServerError)
-		}
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{

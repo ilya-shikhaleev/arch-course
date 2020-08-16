@@ -319,7 +319,7 @@
 							"            \"type\": \"string\"",
 							"        },",
 							"        \"material\": {",
-							"            \"type\": \"number\"",
+							"            \"type\": \"string\"",
 							"        },",
 							"        \"price\": {",
 							"            \"type\": \"number\"",
@@ -673,7 +673,7 @@
 			"response": []
 		},
 		{
-			"name": "Read Orders",
+			"name": "Read Order Pending",
 			"event": [
 				{
 					"listen": "test",
@@ -718,6 +718,7 @@
 							"pm.test(\"Data is valid\", function () {",
 							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
 							"    pm.expect(jsonData.orders.length).to.eql(1);",
+							"    pm.expect(jsonData.orders[0].status).to.eql(\"pending\");",
 							"});",
 							"",
 							"var responseJSON = JSON.parse(responseBody)",
@@ -745,6 +746,46 @@
 						"api",
 						"v1",
 						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay Order Directly Error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0d6396bf-be0e-48d4-be05-9462b8b2f0ae",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/internal/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"internal",
+						"orders",
+						"{{orderId}}"
 					]
 				}
 			},
@@ -809,6 +850,142 @@
 						"api",
 						"v1",
 						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "318eb274-f1e2-48af-b2db-3fea900b1f5e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ba1133fe-b76b-4b92-a5f8-83d86fb012ff",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"orderID\": \"{{orderId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/payment",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Order Completed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cd03388d-a960-4499-96d4-92fa200cca72",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"",
+							"    \"properties\": {",
+							"        \"orders\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"",
+							"                \"properties\": {",
+							"                    \"orderID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"status\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"products\": {",
+							"                        \"type\": \"array\"",
+							"                    },",
+							"                },",
+							"                \"required\": [\"orderID\", \"status\", \"products\"]",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
+							"    pm.expect(jsonData.orders.length).to.eql(1);",
+							"    pm.expect(jsonData.orders[0].status).to.eql(\"completed\");",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
 					]
 				}
 			},
@@ -1423,97 +1600,97 @@
 	],
 	"variable": [
 		{
-			"id": "a790bb76-3abf-4467-b349-2f3381c3e95c",
+			"id": "5bc3cf13-93a3-49aa-862b-9eab2c7552ef",
 			"key": "baseUrl",
 			"value": "arch.homework"
 		},
 		{
-			"id": "6ebaef9f-aaa0-44d0-b800-7688e014fe36",
+			"id": "79617200-f5bb-4f91-bda8-16955ad153d6",
 			"key": "userId",
 			"value": ""
 		},
 		{
-			"id": "79f440f9-9214-4f6e-9adc-1738acaef8fe",
+			"id": "fdd5e0b0-43e4-4812-8be5-8ea17a26e04f",
 			"key": "login",
 			"value": ""
 		},
 		{
-			"id": "b82984cd-d466-4544-bccf-7e367ad91a1a",
+			"id": "981e2536-13ff-4b31-8431-59ccbd64aca7",
 			"key": "email",
 			"value": ""
 		},
 		{
-			"id": "ba3e156b-c455-4730-99bc-520d8a304d9c",
+			"id": "889a20df-418a-471c-a95d-e5c0d64d0b88",
 			"key": "firstName",
 			"value": ""
 		},
 		{
-			"id": "9ff02e71-33e5-44b1-a6fc-f77c0ab918b5",
+			"id": "2c7acffd-2b8a-4ca7-86d0-615678f438ee",
 			"key": "lastName",
 			"value": ""
 		},
 		{
-			"id": "4d230920-53a4-44bd-8517-a951b450f4ee",
+			"id": "f7a8c1e1-ed11-4fec-98ec-bad3fd98dfdc",
 			"key": "password",
 			"value": ""
 		},
 		{
-			"id": "232397b6-a1f4-4894-b576-edf8081e21b4",
+			"id": "73410635-a90c-4461-b318-8fbe2db08dea",
 			"key": "phone",
 			"value": ""
 		},
 		{
-			"id": "1141b591-997f-4006-b355-7c4db4797c77",
+			"id": "c92c92a1-c1e3-4efb-a062-aa34330f668d",
 			"key": "id",
 			"value": ""
 		},
 		{
-			"id": "52345b9a-c37c-488e-8325-8099a1f29ab9",
+			"id": "b3ec43f8-7085-4f3a-9269-69fc94d44d6c",
 			"key": "newEmail",
 			"value": ""
 		},
 		{
-			"id": "4c5ba7a8-a344-418d-a36b-a7a73022a198",
+			"id": "188a8b90-42b1-4fbb-9648-792385d3ac8e",
 			"key": "newLogin",
 			"value": ""
 		},
 		{
-			"id": "3102ac50-b68c-41a9-a4da-c10cf84b521a",
+			"id": "c869a317-5a11-436d-a383-0bd8bff0cd15",
 			"key": "email2",
 			"value": ""
 		},
 		{
-			"id": "f3257a05-74d2-462f-b36d-9b109db47270",
+			"id": "5e1afe5c-c0df-4dc6-b48f-b9026e84d71f",
 			"key": "firstName2",
 			"value": ""
 		},
 		{
-			"id": "26bc5c0f-babd-4d5f-8bc7-5ef42b6e5482",
+			"id": "c1ad1e1d-6006-4d76-9b02-4995b9079783",
 			"key": "lastName2",
 			"value": ""
 		},
 		{
-			"id": "cba78335-7791-40c5-89d3-30ed7cc072ae",
+			"id": "8ee733fc-415b-4221-bc65-122ead019a1b",
 			"key": "login2",
 			"value": ""
 		},
 		{
-			"id": "1d2d768a-7b56-4608-8b1c-d059114b5abc",
+			"id": "c5f7537d-2493-42ba-afdc-cc4259291618",
 			"key": "password2",
 			"value": ""
 		},
 		{
-			"id": "4eb53e44-875c-438e-a42f-659a32e38c8b",
+			"id": "f5eb9825-8e7a-4135-b80a-a279686e198b",
 			"key": "phone2",
 			"value": ""
 		},
 		{
-			"id": "6416df97-e769-48e4-a760-455aa558570d",
+			"id": "d8bc3eec-302e-4422-9c49-0a82a35e675f",
 			"key": "userId2",
 			"value": ""
 		},
 		{
-			"id": "f7285962-59ce-4630-882d-7d0e8b3a38ea",
+			"id": "0b2cf86d-e1b2-461b-b87d-b74e0b7910b5",
 			"key": "orderId",
 			"value": ""
 		}

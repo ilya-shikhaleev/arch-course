@@ -16,7 +16,7 @@ type readProductResponse struct {
 	MetaProductID string  `json:"metaProductID,omitempty"`
 	Title         string  `json:"title,omitempty"`
 	Description   string  `json:"description,omitempty"`
-	Material      int     `json:"material,omitempty"`
+	Material      string  `json:"material,omitempty"`
 	Height        *int    `json:"height,omitempty"`
 	Color         *string `json:"color,omitempty"`
 	Price         float32 `json:"price,omitempty"`
@@ -28,11 +28,21 @@ func makeReadProductEndpoint(repo product.Repository) endpoint.Endpoint {
 		if p, err := repo.FindByID(product.ID(req.ID)); err != nil {
 			return readProductResponse{}, err
 		} else {
+			var material string
+			switch p.Material {
+			case product.Paper:
+				material = "paper"
+			case product.FullMetal:
+				material = "fullmetal"
+			case product.Template:
+				material = "template"
+			}
+
 			return readProductResponse{
 				MetaProductID: string(p.MetaProductID),
 				Title:         p.Title,
 				Description:   p.Description,
-				Material:      int(p.Material),
+				Material:      material,
 				Height:        p.Height,
 				Color:         p.Color,
 				Price:         p.Price,

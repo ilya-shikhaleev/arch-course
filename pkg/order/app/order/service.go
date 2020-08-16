@@ -1,15 +1,15 @@
 package order
 
-func NewService(repo Repository, productsRetriever OrderProductsRetriever) *Service {
+func NewService(repo Repository, productsRetriever ProductsRetriever) *Service {
 	return &Service{repo, productsRetriever}
 }
 
 type Service struct {
 	repo              Repository
-	productsRetriever OrderProductsRetriever
+	productsRetriever ProductsRetriever
 }
 
-type OrderProductsRetriever interface {
+type ProductsRetriever interface {
 	OrderProducts(userID string) ([]Product, error)
 }
 
@@ -41,4 +41,14 @@ func (s *Service) CreateOrder(userID string) (orderID ID, err error) {
 	// TODO: call payment service or create some event
 
 	return orderID, nil
+}
+
+func (s *Service) PayOrder(orderID string) error {
+	o, err := s.repo.FindByID(ID(orderID))
+	if err != nil {
+		return err
+	}
+
+	o.Status = Completed
+	return s.repo.Store(o)
 }
