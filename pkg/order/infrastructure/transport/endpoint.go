@@ -67,7 +67,7 @@ type createOrderRequest struct {
 }
 
 type createOrderResponse struct {
-	OrderID string
+	OrderID string `json:"orderID,omitempty"`
 }
 
 func makeCreateOrderEndpoint(service *order.Service) endpoint.Endpoint {

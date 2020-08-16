@@ -539,6 +539,282 @@
 			"response": []
 		},
 		{
+			"name": "Read Orders (empty list)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "41686f7b-05ad-4a54-bc77-5ff757881922",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"",
+							"    \"properties\": {",
+							"        \"orders\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"",
+							"                \"properties\": {",
+							"                    \"orderID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"status\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"products\": {",
+							"                        \"type\": \"array\"",
+							"                    },",
+							"                },",
+							"                \"required\": [\"orderID\", \"status\", \"products\"]",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(0);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2099317c-1f98-4ca6-8ac9-78735daf6b74",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"orderID\": {",
+							"            \"type\": \"string\"",
+							"        }",
+							"    },",
+							"    \"required\": [\"orderID\"]",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"orderId\", jsonData.orderID);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Orders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "780e77e9-6b2c-4cf0-bd9e-37a102d0f75b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"",
+							"    \"properties\": {",
+							"        \"orders\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"",
+							"                \"properties\": {",
+							"                    \"orderID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"status\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"products\": {",
+							"                        \"type\": \"array\"",
+							"                    },",
+							"                },",
+							"                \"required\": [\"orderID\", \"status\", \"products\"]",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
+							"    pm.expect(jsonData.orders.length).to.eql(1);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Cart (empty)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9327f8b1-8ed0-4b84-852e-255602fd0410",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"cartID\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"productIDs\": {",
+							"            \"type\": \"array\"",
+							"        },",
+							"    },",
+							"    \"required\": [\"cartID\"]",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(jsonData.productIDs).to.eql(undefined);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/cart",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Update user",
 			"event": [
 				{
@@ -1147,93 +1423,98 @@
 	],
 	"variable": [
 		{
-			"id": "631a7e89-bddb-49a5-9edc-2f5db5a0e654",
+			"id": "a790bb76-3abf-4467-b349-2f3381c3e95c",
 			"key": "baseUrl",
 			"value": "arch.homework"
 		},
 		{
-			"id": "ec587129-4ca9-4622-80a0-67c1fbd8acbd",
+			"id": "6ebaef9f-aaa0-44d0-b800-7688e014fe36",
 			"key": "userId",
 			"value": ""
 		},
 		{
-			"id": "d4ac73d8-bc62-4d33-8ab9-dccbf5d0a2a1",
+			"id": "79f440f9-9214-4f6e-9adc-1738acaef8fe",
 			"key": "login",
 			"value": ""
 		},
 		{
-			"id": "ec488617-a236-4d00-b928-68af2b7f70ff",
+			"id": "b82984cd-d466-4544-bccf-7e367ad91a1a",
 			"key": "email",
 			"value": ""
 		},
 		{
-			"id": "ff9e7682-178a-49ef-88f6-e3e8caba19cb",
+			"id": "ba3e156b-c455-4730-99bc-520d8a304d9c",
 			"key": "firstName",
 			"value": ""
 		},
 		{
-			"id": "9f62fb29-a4f1-4ad4-a2fd-046d4fb3969c",
+			"id": "9ff02e71-33e5-44b1-a6fc-f77c0ab918b5",
 			"key": "lastName",
 			"value": ""
 		},
 		{
-			"id": "0facdb38-c545-4a95-a7bf-3868aa488a51",
+			"id": "4d230920-53a4-44bd-8517-a951b450f4ee",
 			"key": "password",
 			"value": ""
 		},
 		{
-			"id": "8166a643-4139-4d8e-932e-3766bb72079f",
+			"id": "232397b6-a1f4-4894-b576-edf8081e21b4",
 			"key": "phone",
 			"value": ""
 		},
 		{
-			"id": "293c6d3c-46b5-4d52-aa24-b8cd1afd3b5f",
+			"id": "1141b591-997f-4006-b355-7c4db4797c77",
 			"key": "id",
 			"value": ""
 		},
 		{
-			"id": "f542e6c4-4aa8-4da5-a049-3942f1182331",
+			"id": "52345b9a-c37c-488e-8325-8099a1f29ab9",
 			"key": "newEmail",
 			"value": ""
 		},
 		{
-			"id": "7c78dafd-4937-4b4a-8140-489de1845751",
+			"id": "4c5ba7a8-a344-418d-a36b-a7a73022a198",
 			"key": "newLogin",
 			"value": ""
 		},
 		{
-			"id": "2c41f634-ba8d-4547-af0a-b8363cd16b5b",
+			"id": "3102ac50-b68c-41a9-a4da-c10cf84b521a",
 			"key": "email2",
 			"value": ""
 		},
 		{
-			"id": "07e8ad80-09e2-4bc5-b492-78e01ae68ef3",
+			"id": "f3257a05-74d2-462f-b36d-9b109db47270",
 			"key": "firstName2",
 			"value": ""
 		},
 		{
-			"id": "bcb549a9-1f6d-480e-91a6-c16796a9f90d",
+			"id": "26bc5c0f-babd-4d5f-8bc7-5ef42b6e5482",
 			"key": "lastName2",
 			"value": ""
 		},
 		{
-			"id": "e6533292-bf0c-45e8-a7ea-557add149fd3",
+			"id": "cba78335-7791-40c5-89d3-30ed7cc072ae",
 			"key": "login2",
 			"value": ""
 		},
 		{
-			"id": "de15487a-dbf4-42f4-9d05-67ab7da8a1a0",
+			"id": "1d2d768a-7b56-4608-8b1c-d059114b5abc",
 			"key": "password2",
 			"value": ""
 		},
 		{
-			"id": "c163907b-f537-4327-8f73-859e0f084fc7",
+			"id": "4eb53e44-875c-438e-a42f-659a32e38c8b",
 			"key": "phone2",
 			"value": ""
 		},
 		{
-			"id": "f2b027dd-ec5e-4a5d-912f-5a8e47c5c76c",
+			"id": "6416df97-e769-48e4-a760-455aa558570d",
 			"key": "userId2",
+			"value": ""
+		},
+		{
+			"id": "f7285962-59ce-4630-882d-7d0e8b3a38ea",
+			"key": "orderId",
 			"value": ""
 		}
 	],
