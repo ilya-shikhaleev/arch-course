@@ -46,9 +46,9 @@ traefik:
     enabled: true
   metrics:
     prometheus:
-      enabled: false
+      enabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
   ssl:
     enabled: false
   deployment:

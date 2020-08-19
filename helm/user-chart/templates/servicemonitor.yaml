@@ -14,7 +14,7 @@ spec:
     matchLabels:
       {{- include "user-chart.selectorLabels" . | nindent 6 }}
   endpoints:
-    - interval: 15s
+    - interval: 5s
       port: http
       path: /metrics
 {{- end }}

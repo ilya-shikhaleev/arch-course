@@ -24,3 +24,15 @@ make start
 ```
 newman run app_tests.postman_collection.json
 ```
+
+5) Мониторинги
+```
+kubectl port-forward service/user-grafana 9000:80
+kubectl port-forward service/prometheus-operated 9090
+```
+
+6) Запустите нагрузочные тесты на сервис popular
+```
+make run-stresstest
+make stop-stresstest
+```

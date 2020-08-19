@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "order-chart.fullname" . }}
+  labels:
+    {{- include "order-chart.labels" . | nindent 4 }}
+spec:
+  jobLabel: {{ include "order-chart.fullname" . }}
+  namespaceSelector:
+    matchNames:
+      - "{{ $.Release.Namespace }}"
+  selector:
+    matchLabels:
+      {{- include "order-chart.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - interval: 5s
+      port: http
+      path: /metrics

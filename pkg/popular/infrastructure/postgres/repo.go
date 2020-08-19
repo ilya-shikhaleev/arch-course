@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -13,10 +14,14 @@ func NewPopularRepository(db *sql.DB) popular.Repository {
 }
 
 type repository struct {
-	db *sql.DB
+	db    *sql.DB
+	cache []popular.Product
 }
 
 func (repo *repository) FindPopular(count int) ([]popular.Product, error) {
+	if len(repo.cache) > 0 {
+		return repo.cache, nil
+	}
 	sqlStatement := `SELECT product_id, title, description, material, height, color, price, buy_count						
 						FROM popular 
 						ORDER BY buy_count DESC LIMIT $1`
@@ -33,6 +38,12 @@ func (repo *repository) FindPopular(count int) ([]popular.Product, error) {
 		}
 		products = append(products, p)
 	}
+	repo.cache = products
+	go func() {
+		time.Sleep(15 * time.Second)
+		repo.cache = []popular.Product{}
+	}()
+
 	return products, errors.WithStack(err)
 }
 

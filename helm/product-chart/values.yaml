@@ -27,10 +27,6 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: http,https
-    #traefik.frontend.rule.type: PathPrefixStrip
-    ingress.kubernetes.io/auth-type: forward
-    ingress.kubernetes.io/auth-url: http://user-user-chart.arch-course.svc.cluster.local:9000/auth
-    ingress.kubernetes.io/auth-response-headers: X-User-Id, X-Email, X-Login, X-First-Name, X-Last-Name
 
 postgresql:
   postgresqlDatabase: arch-course-db
@@ -46,9 +42,9 @@ traefik:
     enabled: true
   metrics:
     prometheus:
-      enabled: false
+      enabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
   ssl:
     enabled: false
   deployment:

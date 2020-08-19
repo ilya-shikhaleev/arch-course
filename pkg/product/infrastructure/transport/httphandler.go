@@ -58,7 +58,7 @@ func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{},
 		Search string `json:"search,omitempty"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, newErrInvalidRequest(err, "invalid add product request")
+		return nil, newErrInvalidRequest(err, "invalid read product request")
 	}
 	req := readProductsRequest{Search: body.Search}
 	return req, nil

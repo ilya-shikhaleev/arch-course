@@ -30,6 +30,6 @@ spec:
             - sh
             - "-c"
             - |
-              while true; do ab -n50 -c5 -H "Host: arch.homework" http://user-traefik/otusapp/api/v1/users/2c801978-815c-11ea-a3d4-02420a200002 ; sleep 3; done
+              while true; do ab -n300 -c30 -H "Host: arch.homework" http://popular-traefik/api/v1/popular ; sleep 3; done
 
   backoffLimit: 0

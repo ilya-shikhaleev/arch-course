@@ -45,14 +45,13 @@ func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{},
 	var body struct {
 		Count int `json:"count,omitempty"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, newErrInvalidRequest(err, "invalid add product request")
+	count := 6 // default value
+	if err := json.NewDecoder(r.Body).Decode(&body); err == nil {
+		if body.Count > 0 {
+			count = body.Count
+		}
 	}
 
-	count := 6 // default value
-	if body.Count > 0 {
-		count = body.Count
-	}
 	req := readProductsRequest{Count: count}
 	return req, nil
 }
@@ -62,7 +61,7 @@ func decodeOnBuyProductsRequest(_ context.Context, r *http.Request) (interface{}
 		ProductIDs []string `json:"productIDs,omitempty"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, newErrInvalidRequest(err, "invalid add product request")
+		return nil, newErrInvalidRequest(err, "invalid on buy product request")
 	}
 	req := onBuyProductsRequest{ProductIDs: body.ProductIDs}
 	return req, nil
