@@ -48,19 +48,160 @@
 			"response": []
 		},
 		{
-			"name": "Get product error",
+			"name": "Search product unauthenticated",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "86cc1524-ae65-4289-ab70-b378027dc8c7",
+						"id": "d4a117b3-c747-42e5-8c59-144f8233b9d9",
 						"exec": [
-							"pm.test(\"Status code is 401\", function () {",
-							"    pm.response.to.have.status(401);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
 							"",
+							"var schema = {",
+							"    \"type\":\"object\",",
+							"    \"properties\": {",
+							"        \"products\": {",
+							"            \"type\": \"array\",",
+							"            \"items\": {",
+							"                \"type\": \"object\",",
+							"                \"properties\": {",
+							"                    \"productID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"metaProductID\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"title\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"description\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"material\": {",
+							"                        \"type\": \"string\"",
+							"                    },",
+							"                    \"price\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"height\": {",
+							"                        \"type\": \"number\"",
+							"                    },",
+							"                    \"color\": {",
+							"                        \"type\": \"string\"",
+							"                    }",
+							"                },",
+							"                \"required\": [\"metaProductID\", \"title\", \"description\", \"material\", \"price\"]   ",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Data is valid\", function () {",
+							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
+							"    pm.expect(jsonData.products.length > 0).to.eql(true);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"productId\", jsonData.products[0].productID);",
+							"",
+							"",
 							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
-							"tests[\"[INFO] Response: \" + responseBody] = true;"
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"search\": \"Go\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get product unauthenticated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "59dd48c6-f3a1-429b-b2e8-a62539111e22",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"metaProductID\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"title\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"description\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"material\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"price\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"height\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"color\": {",
+							"            \"type\": \"string\"",
+							"        }",
+							"    },",
+							"    \"required\": [\"metaProductID\", \"title\", \"description\", \"material\", \"price\"]",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
+							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -70,7 +211,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
+					"raw": "http://{{baseUrl}}/api/v1/products/{{productId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
@@ -79,7 +220,7 @@
 						"api",
 						"v1",
 						"products",
-						"72eb9cf0-da7f-11ea-ab94-02420a200004"
+						"{{productId}}"
 					]
 				}
 			},
@@ -158,45 +299,6 @@
 						"v1",
 						"users",
 						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get product error",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7e0794ab-981b-4b4a-a870-8dd6b4687e6e",
-						"exec": [
-							"pm.test(\"Status code is 401\", function () {",
-							"    pm.response.to.have.status(401);",
-							"});",
-							"",
-							"",
-							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
-							"tests[\"[INFO] Response: \" + responseBody] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
-					"protocol": "http",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"products",
-						"72eb9cf0-da7f-11ea-ab94-02420a200004"
 					]
 				}
 			},
@@ -1368,19 +1470,57 @@
 			"response": []
 		},
 		{
-			"name": "Get product error",
+			"name": "Get product unauthenticated",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "4cc6ee46-a0a4-4dfa-92a0-5e424ab36eb5",
+						"id": "227e484b-798f-4f04-9fdd-1490832e5079",
 						"exec": [
-							"pm.test(\"Status code is 401\", function () {",
-							"    pm.response.to.have.status(401);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
 							"",
+							"var schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"metaProductID\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"title\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"description\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"material\": {",
+							"            \"type\": \"string\"",
+							"        },",
+							"        \"price\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"height\": {",
+							"            \"type\": \"number\"",
+							"        },",
+							"        \"color\": {",
+							"            \"type\": \"string\"",
+							"        }",
+							"    },",
+							"    \"required\": [\"metaProductID\", \"title\", \"description\", \"material\", \"price\"]",
+							"};",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"id\", jsonData.id);",
+							"",
+							"",
 							"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
-							"tests[\"[INFO] Response: \" + responseBody] = true;"
+							"tests[\"[INFO] Response: \" + responseBody] = true;",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1390,7 +1530,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/api/v1/products/72eb9cf0-da7f-11ea-ab94-02420a200004",
+					"raw": "http://{{baseUrl}}/api/v1/products/{{productId}}",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
@@ -1399,7 +1539,7 @@
 						"api",
 						"v1",
 						"products",
-						"72eb9cf0-da7f-11ea-ab94-02420a200004"
+						"{{productId}}"
 					]
 				}
 			},
@@ -1797,102 +1937,102 @@
 	],
 	"variable": [
 		{
-			"id": "035d5522-7b8a-4161-8ee0-f06237b5030c",
+			"id": "485d5382-7ccf-4f1e-ad11-04a51ab5e985",
 			"key": "baseUrl",
 			"value": "arch.homework"
 		},
 		{
-			"id": "e2f076c6-58fb-42c8-96a1-a3b5e2e5e41c",
+			"id": "5e5d01d5-2048-41ee-8c4a-bd2f3b5b4978",
 			"key": "userId",
 			"value": ""
 		},
 		{
-			"id": "816ac82f-3986-42f9-9abf-00c4aee8eb3d",
+			"id": "83af86bd-be95-4210-868d-c0916fd009b2",
 			"key": "login",
 			"value": ""
 		},
 		{
-			"id": "ff5cf1d4-dc34-4317-b491-46af87e5c981",
+			"id": "3ba8211c-5b7b-416f-8bcc-86bf4e26e095",
 			"key": "email",
 			"value": ""
 		},
 		{
-			"id": "69a898d7-6b86-4b42-930b-b4be499e8d05",
+			"id": "aec7d4b3-d610-44c4-bc38-63e6652a03af",
 			"key": "firstName",
 			"value": ""
 		},
 		{
-			"id": "befc675a-f45c-4315-b57b-aa4e22ba3322",
+			"id": "ab5596e1-0143-4728-bbf8-eca5f096f50a",
 			"key": "lastName",
 			"value": ""
 		},
 		{
-			"id": "96078472-fbc4-4919-8d1b-f44d010aa591",
+			"id": "4eee4af8-ea1d-481b-997b-1a55cb2c4117",
 			"key": "password",
 			"value": ""
 		},
 		{
-			"id": "26b643d6-ed70-4a6d-8557-4ca364afa0ac",
+			"id": "fb74e67a-ed2f-4bdf-a802-0e35206f38cb",
 			"key": "phone",
 			"value": ""
 		},
 		{
-			"id": "9b4012e5-1833-4fe7-bbfa-6a6c5b7fb86c",
+			"id": "cfb534f5-aca9-4788-b845-7445205d0cc7",
 			"key": "id",
 			"value": ""
 		},
 		{
-			"id": "f017c7ae-955e-442e-b808-115692945989",
+			"id": "aedc517d-d076-43ee-a720-85dd68116b31",
 			"key": "newEmail",
 			"value": ""
 		},
 		{
-			"id": "94a7b7e3-f50c-4329-8451-c2e930bdfdf1",
+			"id": "1f357cec-bc73-4a51-9dd5-913c1aa114bd",
 			"key": "newLogin",
 			"value": ""
 		},
 		{
-			"id": "d946dceb-66e7-4158-99c2-1ad0d03d0a49",
+			"id": "756b8d5c-5f33-466f-be27-da64666feb4d",
 			"key": "email2",
 			"value": ""
 		},
 		{
-			"id": "7044558c-ba45-470a-9184-cff572909c24",
+			"id": "01add96b-9c67-4680-add4-4c45771d8ec6",
 			"key": "firstName2",
 			"value": ""
 		},
 		{
-			"id": "0bb6b512-5f2d-432b-b0e8-2ec32b0e9e3a",
+			"id": "d0e6a285-776b-4527-9fff-5b7fc72656f4",
 			"key": "lastName2",
 			"value": ""
 		},
 		{
-			"id": "6bfb5507-d1a3-4b56-8144-14f7bff1ce07",
+			"id": "62241469-3a61-4ded-b1d7-eb5a0dae7c79",
 			"key": "login2",
 			"value": ""
 		},
 		{
-			"id": "01fede14-9e84-4dbe-8725-c4f628269ad6",
+			"id": "7dca3938-0de5-492c-94e9-d5cd95b5c3ef",
 			"key": "password2",
 			"value": ""
 		},
 		{
-			"id": "3cc071f8-fd6c-4e81-96f3-b5c3ad8e209d",
+			"id": "ea6ba8a2-5d31-44a3-9bf9-85e0f3807671",
 			"key": "phone2",
 			"value": ""
 		},
 		{
-			"id": "7ae34858-766f-4992-9904-443f6f883e2d",
+			"id": "a091ebe9-4c70-4347-b8d3-3902516c89ce",
 			"key": "userId2",
 			"value": ""
 		},
 		{
-			"id": "88dff7b3-0831-455a-8db4-c0e358af09e8",
+			"id": "9b412156-45de-4389-b1d3-ec6d31239545",
 			"key": "orderId",
 			"value": ""
 		},
 		{
-			"id": "788268cc-1d2d-4845-848f-241116947cb1",
+			"id": "e4ef82e9-74eb-4769-997a-f2bd5d9d2c52",
 			"key": "productId",
 			"value": ""
 		}
