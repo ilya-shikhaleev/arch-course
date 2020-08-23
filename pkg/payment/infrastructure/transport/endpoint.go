@@ -19,8 +19,8 @@ func makePayOrderEndpoint() endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(payOrderRequest)
 
-		const cartHost = "http://order-order-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
-		httpReq, err := http.NewRequest(http.MethodPatch, cartHost+"/api/v1/internal/orders/"+req.OrderID, nil)
+		const host = "http://order-order-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
+		httpReq, err := http.NewRequest(http.MethodPatch, host+"/api/v1/internal/orders/"+req.OrderID, nil)
 		if err != nil {
 			return 0, err
 		}

@@ -59,8 +59,8 @@ func OnBuyProducts(req OnBuyProductsRequest, repo popular.Repository) error {
 }
 
 func getProduct(productID string) (product, error) {
-	const cartHost = "http://product-product-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
-	req, err := http.NewRequest(http.MethodGet, cartHost+"/api/v1/internal/products/"+productID, nil)
+	const host = "http://product-product-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
+	req, err := http.NewRequest(http.MethodGet, host+"/api/v1/internal/products/"+productID, nil)
 	if err != nil {
 		return product{}, err
 	}

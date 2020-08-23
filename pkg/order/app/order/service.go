@@ -11,6 +11,7 @@ type Service struct {
 
 type ProductsRetriever interface {
 	OrderProducts(userID string) ([]Product, error)
+	RestoreProducts(userID string, products []Product) error
 }
 
 func (s *Service) CreateOrder(userID string) (orderID ID, err error) {
@@ -36,6 +37,7 @@ func (s *Service) CreateOrder(userID string) (orderID ID, err error) {
 	}
 	err = s.repo.Store(o)
 	if err != nil {
+		_ = s.productsRetriever.RestoreProducts(userID, products)
 		return orderID, err
 	}
 	// TODO: call payment service or create some event
