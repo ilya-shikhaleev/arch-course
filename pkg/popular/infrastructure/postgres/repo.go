@@ -32,6 +32,7 @@ func (repo *repository) FindPopular(count int) ([]popular.Product, error) {
 		return products, nil
 	}
 
+	// TODO: var products []popular.Product
 	sqlStatement := `SELECT product_id, title, description, material, height, color, price, buy_count						
 						FROM popular 
 						ORDER BY buy_count DESC LIMIT $1`

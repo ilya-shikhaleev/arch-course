@@ -95,17 +95,15 @@ func makePayOrderEndpoint(service *order.Service, repo order.Repository, channel
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(payOrderRequest)
 		if err := service.PayOrder(req.OrderID); err != nil {
-			return createOrderResponse{}, errors.WithStack(err)
+			return payOrderResponse{}, errors.WithStack(err)
 		} else {
-			// TODO: use rabbit mq there
-			const cartHost = "http://popular-popular-chart.arch-course.svc.cluster.local:9000" // TODO: use env variable here
 			var params struct {
 				ProductIDs []string `json:"productIDs"`
 			}
 
 			o, err := repo.FindByID(order.ID(req.OrderID))
 			if err != nil {
-				return createOrderResponse{}, nil
+				return payOrderResponse{}, nil
 			}
 			var productIDs []string
 			for _, p := range o.Products {
@@ -115,12 +113,12 @@ func makePayOrderEndpoint(service *order.Service, repo order.Repository, channel
 			params.ProductIDs = productIDs
 			paramsBytes, err := json.Marshal(params)
 			if err != nil {
-				return createOrderResponse{}, nil
+				return payOrderResponse{}, nil
 			}
 
 			err = channel.Send(string(paramsBytes), "order_paid")
 
-			return createOrderResponse{}, err
+			return payOrderResponse{}, nil
 		}
 	}
 }

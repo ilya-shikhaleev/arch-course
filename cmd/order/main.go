@@ -115,7 +115,7 @@ func logMiddleware(h http.Handler, logger *logrus.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusWriter := statusWriter{ResponseWriter: w}
 		h.ServeHTTP(&statusWriter, r)
-		if r.URL.Path != "/health" && r.URL.Path != "/ready" {
+		if r.URL.Path != "/health" && r.URL.Path != "/ready" && r.URL.Path != "/metrics" {
 			logger.WithFields(logrus.Fields{
 				"method":     r.Method,
 				"url":        r.URL,
@@ -253,7 +253,7 @@ func initRabbitMQ(logger *logrus.Logger) *amqp.Connection {
 	for {
 
 		amqpConnection := amqp.NewAMQPConnection(&amqp.Config{Host: host, User: user, Password: password}, l)
-		ch := amqp.NewOrderDomainEventsChannel()
+		ch := amqp.NewOrderDomainEventsChannel(false)
 		amqpConnection.AddChannel(ch)
 		err := amqpConnection.Start()
 		if err != nil {
