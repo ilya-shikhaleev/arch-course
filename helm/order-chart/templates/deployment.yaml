@@ -29,6 +29,21 @@ spec:
                 configMapKeyRef:
                   name: order-config
                   key: {{ .Values.configNames.port }}
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: {{ .Values.configNames.rabbitmqHost }}
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: {{ .Values.configNames.rabbitmqUser }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-secret
+                  key: {{ .Values.configNames.rabbitmqPassword }}
             - name: POSTGRES_HOST
               valueFrom:
                 configMapKeyRef:

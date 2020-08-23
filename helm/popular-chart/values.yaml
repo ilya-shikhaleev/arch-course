@@ -21,6 +21,9 @@ configNames:
   redisHost: REDIS_HOST
   redisPort: REDIS_PORT
   redisPassword: REDIS_PASSWORD
+  rabbitmqUser: RABBITMQ_USER
+  rabbitmqPassword: RABBITMQ_PASSWORD
+  rabbitmqHost: RABBITMQ_HOST
 
 ingress:
   host: "arch.homework"
@@ -62,3 +65,8 @@ traefik:
 redis:
   redisPort: "6379"
   password: passwd
+
+rabbitmq:
+  auth:
+    username: user
+    password: passwd

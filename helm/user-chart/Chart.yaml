@@ -45,3 +45,7 @@ dependencies:
     version: "1.86.*"
     repository: "https://kubernetes-charts.storage.googleapis.com"
     condition: ingress.enabled
+
+  - name: rabbitmq
+    version: "7.6.*"
+    repository: "https://charts.bitnami.com/bitnami"

@@ -28,15 +28,7 @@ func MakeHandler(repo popular.Repository, logger httplog.Logger) http.Handler {
 		opts...,
 	)
 
-	onBuyProductsHandler := httptransport.NewServer(
-		makeOnBuyProductsEndpoint(repo),
-		decodeOnBuyProductsRequest,
-		encodeResponse,
-		opts...,
-	)
-
 	r.Handle("/api/v1/popular", readProductsHandler).Methods(http.MethodGet)
-	r.Handle("/api/v1/internal/popular/buy", onBuyProductsHandler).Methods(http.MethodPost)
 
 	return r
 }
@@ -53,17 +45,6 @@ func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{},
 	}
 
 	req := readProductsRequest{Count: count}
-	return req, nil
-}
-
-func decodeOnBuyProductsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var body struct {
-		ProductIDs []string `json:"productIDs,omitempty"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return nil, newErrInvalidRequest(err, "invalid on buy product request")
-	}
-	req := onBuyProductsRequest{ProductIDs: body.ProductIDs}
 	return req, nil
 }
 

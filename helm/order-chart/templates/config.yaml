@@ -8,6 +8,8 @@ data:
   {{ .Values.configNames.postgresPort }}: {{ .Values.postgresql.service.port | quote }}
   {{ .Values.configNames.postgresDbName }}: {{ .Values.postgresql.postgresqlDatabase }}
   {{ .Values.configNames.postgresUser }}: {{ .Values.postgresql.postgresqlUsername }}
+  {{ .Values.configNames.rabbitmqHost }}: {{ include "rabbitmq.fullname" . }}
+  {{ .Values.configNames.rabbitmqUser }}: {{ .Values.rabbitmq.auth.username }}
 ---
 apiVersion: v1
 kind: Secret
@@ -16,3 +18,4 @@ metadata:
 type: Opaque
 data:
   {{ .Values.configNames.postgresPassword }}: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+  {{ .Values.configNames.rabbitmqPassword }}: {{ .Values.rabbitmq.auth.password | b64enc | quote }}

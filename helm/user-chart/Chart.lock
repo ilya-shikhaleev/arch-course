@@ -11,5 +11,8 @@ dependencies:
 - name: traefik
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 1.86.2
-digest: sha256:a83c6a2a012361b545085aa65f2fc4002dc5cd956eef98d1ad380b83f3bc5db4
-generated: "2020-08-09T22:33:59.168193833+03:00"
+- name: rabbitmq
+  repository: https://charts.bitnami.com/bitnami
+  version: 7.6.3
+digest: sha256:cad17d02d044e575f2475b68472d10296d5f3b8afea984f5a378e89e4d897c7c
+generated: "2020-08-23T12:55:56.451259391+03:00"

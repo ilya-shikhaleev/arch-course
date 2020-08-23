@@ -70,3 +70,8 @@ Create the name of the service account to use
 {{- define "redis.fullname" -}}
 {{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "rabbitmq.fullname" -}}
+{{- printf "%s-%s" "user" "rabbitmq" | trunc 63 | trimSuffix "-" -}}
+{{/*{{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}*/}}
+{{- end -}}

@@ -12,12 +12,14 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/ispringteam/go-patterns/infrastructure/jsonlog"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
+	"github.com/ilya-shikhaleev/arch-course/pkg/common/amqp"
 	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
 	"github.com/ilya-shikhaleev/arch-course/pkg/order/infrastructure/postgres"
 	"github.com/ilya-shikhaleev/arch-course/pkg/order/infrastructure/transport"
@@ -25,9 +27,12 @@ import (
 
 var db *sql.DB
 var readyDBCh chan *sql.DB
+var amqpConnection *amqp.Connection
+var readyOrderDomainEventChannelCh chan amqp.Channel
 
 func main() {
 	readyDBCh = make(chan *sql.DB)
+	readyOrderDomainEventChannelCh = make(chan amqp.Channel)
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.Print("Starting the service...")
@@ -36,6 +41,15 @@ func main() {
 	if port == "" {
 		logger.Fatal("Port is not set.")
 	}
+
+	go func() {
+		amqpConnection = initRabbitMQ(logger)
+	}()
+	defer func() {
+		if amqpConnection != nil {
+			_ = amqpConnection.Close()
+		}
+	}()
 
 	go func() {
 		db = initDB(logger)
@@ -82,10 +96,12 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 		logger.Print("Waiting for db")
 		db := <-readyDBCh
 		logger.Print("Db connected")
+		orderDomainEventChannel := <-readyOrderDomainEventChannelCh
+		logger.Print("Rabbit connected")
 		serverErrorLogger := &serverErrorLogger{logger}
 		repo := postgres.NewOrderRepository(db)
 		service := order.NewService(repo, transport.NewProductsRetriever())
-		m.Handle("/api/v1/", transport.MakeHandler(service, repo, serverErrorLogger))
+		m.Handle("/api/v1/", transport.MakeHandler(service, repo, serverErrorLogger, orderDomainEventChannel))
 	}()
 
 	go func() {
@@ -219,6 +235,35 @@ func initDB(logger *logrus.Logger) *sql.DB {
 		}
 		readyDBCh <- db
 		return db
+	}
+}
+
+func initRabbitMQ(logger *logrus.Logger) *amqp.Connection {
+	host := os.Getenv("RABBITMQ_HOST")
+	user := os.Getenv("RABBITMQ_USER")
+	password := os.Getenv("RABBITMQ_PASSWORD")
+	if host == "" || user == "" || password == "" {
+		logger.Fatal("rabbitmq env is not set.")
+	}
+	l := jsonlog.NewLogger(&jsonlog.Config{
+		Level:   jsonlog.InfoLevel,
+		AppName: "order",
+	})
+
+	for {
+
+		amqpConnection := amqp.NewAMQPConnection(&amqp.Config{Host: host, User: user, Password: password}, l)
+		ch := amqp.NewOrderDomainEventsChannel()
+		amqpConnection.AddChannel(ch)
+		err := amqpConnection.Start()
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't open connection to amqp"))
+			time.Sleep(time.Second)
+			continue
+		}
+
+		readyOrderDomainEventChannelCh <- ch
+		return amqpConnection
 	}
 }
 

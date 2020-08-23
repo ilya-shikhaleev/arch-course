@@ -24,6 +24,21 @@ spec:
               containerPort: {{ .Values.appPort }}
               protocol: TCP
           env:
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: popular-config
+                  key: {{ .Values.configNames.rabbitmqHost }}
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: popular-config
+                  key: {{ .Values.configNames.rabbitmqUser }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: popular-secret
+                  key: {{ .Values.configNames.rabbitmqPassword }}
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:

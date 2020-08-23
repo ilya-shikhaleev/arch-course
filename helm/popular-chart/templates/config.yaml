@@ -10,6 +10,8 @@ data:
   {{ .Values.configNames.postgresUser }}: {{ .Values.postgresql.postgresqlUsername }}
   {{ .Values.configNames.redisHost }}: {{ include "redis.fullname" . }}-headless
   {{ .Values.configNames.redisPort }}: {{ .Values.redis.redisPort | quote }}
+  {{ .Values.configNames.rabbitmqHost }}: {{ include "rabbitmq.fullname" . }}
+  {{ .Values.configNames.rabbitmqUser }}: {{ .Values.rabbitmq.auth.username }}
 ---
 apiVersion: v1
 kind: Secret
@@ -19,3 +21,4 @@ type: Opaque
 data:
   {{ .Values.configNames.postgresPassword }}: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
   {{ .Values.configNames.redisPassword }}: {{ .Values.redis.password | b64enc | quote }}
+  {{ .Values.configNames.rabbitmqPassword }}: {{ .Values.rabbitmq.auth.password | b64enc | quote }}

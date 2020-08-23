@@ -12,10 +12,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
+	"github.com/ilya-shikhaleev/arch-course/pkg/common/amqp"
 	"github.com/ilya-shikhaleev/arch-course/pkg/order/app/order"
 )
 
-func MakeHandler(service *order.Service, repo order.Repository, logger httplog.Logger) http.Handler {
+func MakeHandler(service *order.Service, repo order.Repository, logger httplog.Logger, channel amqp.Channel) http.Handler {
 	r := mux.NewRouter()
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
@@ -30,7 +31,7 @@ func MakeHandler(service *order.Service, repo order.Repository, logger httplog.L
 	)
 
 	payOrderHandler := httptransport.NewServer(
-		makePayOrderEndpoint(service, repo),
+		makePayOrderEndpoint(service, repo, channel),
 		decodePayOrderRequest,
 		encodeResponse,
 		opts...,

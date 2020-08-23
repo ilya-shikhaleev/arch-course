@@ -36,6 +36,12 @@ postgresql:
   postgresqlPassword: passwd
   service:
     port: "5432"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: arch-course
+      interval: 10s
 
 metrics:
   serviceMonitor:
@@ -78,7 +84,7 @@ traefik:
       httpsEnabled: false
   serviceType: NodePort
   debug:
-    enabled: true
+    enabled: false
 
 prometheus-operator:
   prometheus:
@@ -91,3 +97,14 @@ prometheus-operator:
       dashboards:
         enabled: true
         label: grafana-dashboard
+
+rabbitmq:
+  auth:
+    username: user
+    password: passwd
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: arch-course
+      interval: 10s

@@ -17,3 +17,4 @@ type: Opaque
 data:
   {{ .Values.configNames.postgresPassword }}: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
   posgressUri: {{ printf "postgresql://%s:%s@%s:%s/%s?sslmode=disable" .Values.postgresql.postgresqlUsername .Values.postgresql.postgresqlPassword (include "postgresql.fullname" .) .Values.postgresql.service.port .Values.postgresql.postgresqlDatabase | b64enc | quote }}
+  postgresql://arch-course:passwd@user-postgresql:5432/arch-course-db?sslmode=disable

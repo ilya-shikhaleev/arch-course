@@ -18,6 +18,9 @@ configNames:
   postgresDbName: POSTGRES_DB
   postgresUser: POSTGRES_USER
   postgresPassword: POSTGRES_PASSWORD
+  rabbitmqUser: RABBITMQ_USER
+  rabbitmqPassword: RABBITMQ_PASSWORD
+  rabbitmqHost: RABBITMQ_HOST
 
 ingress:
   host: "arch.homework"
@@ -59,3 +62,8 @@ traefik:
   serviceType: NodePort
   debug:
     enabled: true
+
+rabbitmq:
+  auth:
+    username: user
+    password: passwd

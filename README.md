@@ -36,3 +36,8 @@ kubectl port-forward service/prometheus-operated 9090
 make run-stresstest
 make stop-stresstest
 ```
+
+7) Для отслеживания популярных продуктов
+```
+kubectl exec -it user-postgresql-0 -- watch -n 1 "psql postgresql://arch-course:passwd@localhost:5432/arch-course-db?sslmode=disable -c 'SELECT product_id, title, buy_count FROM popular;'"
+```
