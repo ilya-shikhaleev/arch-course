@@ -3,14 +3,14 @@ package popular
 import "errors"
 
 type Product struct {
-	ID          string
-	Title       string
-	Description string
-	Material    string
-	Height      *int
-	Color       *string
-	Price       float32
-	BuyCount    int
+	ID          string  `json:"id,omitempty"`
+	Title       string  `json:"title,omitempty"`
+	Description string  `json:"description,omitempty"`
+	Material    string  `json:"material,omitempty"`
+	Height      *int    `json:"height,omitempty"`
+	Color       *string `json:"color,omitempty"`
+	Price       float32 `json:"price,omitempty"`
+	BuyCount    int     `json:"buyCount,omitempty"`
 }
 
 type Repository interface {

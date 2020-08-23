@@ -18,6 +18,9 @@ configNames:
   postgresDbName: POSTGRES_DB
   postgresUser: POSTGRES_USER
   postgresPassword: POSTGRES_PASSWORD
+  redisHost: REDIS_HOST
+  redisPort: REDIS_PORT
+  redisPassword: REDIS_PASSWORD
 
 ingress:
   host: "arch.homework"
@@ -55,3 +58,7 @@ traefik:
   serviceType: NodePort
   debug:
     enabled: true
+
+redis:
+  redisPort: "6379"
+  password: passwd

@@ -24,6 +24,21 @@ spec:
               containerPort: {{ .Values.appPort }}
               protocol: TCP
           env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: popular-config
+                  key: {{ .Values.configNames.redisHost }}
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: popular-config
+                  key: {{ .Values.configNames.redisPort }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: popular-secret
+                  key: {{ .Values.configNames.redisPassword }}
             - name: PORT
               valueFrom:
                 configMapKeyRef:

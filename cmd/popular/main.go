@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -25,8 +26,12 @@ import (
 var db *sql.DB
 var readyDBCh chan *sql.DB
 
+var redisClient *redis.Client
+var readyRedisCh chan *redis.Client
+
 func main() {
 	readyDBCh = make(chan *sql.DB)
+	readyRedisCh = make(chan *redis.Client)
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.Print("Starting the service...")
@@ -37,9 +42,17 @@ func main() {
 	}
 
 	go func() {
-		db = initDB(logger)
+		redisClient = initRedis(logger)
+	}()
+	defer func() {
+		if redisClient != nil {
+			_ = redisClient.Close()
+		}
 	}()
 
+	go func() {
+		db = initDB(logger)
+	}()
 	defer func() {
 		if db != nil {
 			_ = db.Close()
@@ -79,8 +92,9 @@ func startServer(serverUrl string, logger *logrus.Logger) *http.Server {
 	}
 	go func() {
 		db := <-readyDBCh
+		redisClient := <-readyRedisCh
 		serverErrorLogger := &serverErrorLogger{logger}
-		repo := postgres.NewPopularRepository(db)
+		repo := postgres.NewPopularRepository(db, redisClient)
 		m.Handle("/api/v1/", transport.MakeHandler(repo, serverErrorLogger))
 	}()
 
@@ -215,6 +229,36 @@ func initDB(logger *logrus.Logger) *sql.DB {
 		}
 		readyDBCh <- db
 		return db
+	}
+}
+
+func initRedis(logger *logrus.Logger) *redis.Client {
+	host := os.Getenv("REDIS_HOST")
+	port := os.Getenv("REDIS_PORT")
+	password := os.Getenv("REDIS_PASSWORD")
+	if host == "" || port == "" || password == "" {
+		logger.Fatal("Redis env is not set.")
+	}
+
+	for {
+		source := fmt.Sprintf("%s:%v", host, port)
+		redisClient := redis.NewClient(&redis.Options{
+			Addr:     source,
+			Password: password,
+		})
+		if redisClient == nil {
+			logger.Info("can't open connection to " + source)
+			time.Sleep(time.Second)
+			continue
+		}
+		_, err := redisClient.Ping().Result()
+		if err != nil {
+			logger.Info(errors.Wrap(err, "can't ping to "+source))
+			time.Sleep(time.Second)
+			continue
+		}
+		readyRedisCh <- redisClient
+		return redisClient
 	}
 }
 

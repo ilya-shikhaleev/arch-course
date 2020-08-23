@@ -8,6 +8,8 @@ data:
   {{ .Values.configNames.postgresPort }}: {{ .Values.postgresql.service.port | quote }}
   {{ .Values.configNames.postgresDbName }}: {{ .Values.postgresql.postgresqlDatabase }}
   {{ .Values.configNames.postgresUser }}: {{ .Values.postgresql.postgresqlUsername }}
+  {{ .Values.configNames.redisHost }}: {{ include "redis.fullname" . }}-headless
+  {{ .Values.configNames.redisPort }}: {{ .Values.redis.redisPort | quote }}
 ---
 apiVersion: v1
 kind: Secret
@@ -16,3 +18,4 @@ metadata:
 type: Opaque
 data:
   {{ .Values.configNames.postgresPassword }}: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+  {{ .Values.configNames.redisPassword }}: {{ .Values.redis.password | b64enc | quote }}

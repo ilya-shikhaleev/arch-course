@@ -45,7 +45,7 @@ func decodeReadProductsRequest(_ context.Context, r *http.Request) (interface{},
 	var body struct {
 		Count int `json:"count,omitempty"`
 	}
-	count := 6 // default value
+	count := 2 // default value
 	if err := json.NewDecoder(r.Body).Decode(&body); err == nil {
 		if body.Count > 0 {
 			count = body.Count

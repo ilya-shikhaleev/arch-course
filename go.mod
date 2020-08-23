@@ -3,7 +3,9 @@ module github.com/ilya-shikhaleev/arch-course
 go 1.14
 
 require (
+	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/go-kit/kit v0.10.0
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.0.0
 	github.com/gorilla/mux v1.7.4
 	github.com/lib/pq v1.3.0

@@ -13,3 +13,6 @@ dependencies:
     version: "1.86.*"
     repository: "https://kubernetes-charts.storage.googleapis.com"
     condition: ingress.enabled
+  - name: redis
+    version: 10.7.*
+    repository: https://charts.bitnami.com/bitnami

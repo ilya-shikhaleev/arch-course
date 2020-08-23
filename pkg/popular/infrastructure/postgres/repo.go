@@ -2,30 +2,39 @@ package postgres
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
 
 	"github.com/ilya-shikhaleev/arch-course/pkg/popular/app/popular"
 )
 
-func NewPopularRepository(db *sql.DB) popular.Repository {
-	return &repository{db: db}
+func NewPopularRepository(db *sql.DB, client *redis.Client) popular.Repository {
+	return &repository{db: db, client: client}
+}
+
+const redisKey = "products"
+
+type cache struct {
+	Products []popular.Product `json:"products,omitempty"`
 }
 
 type repository struct {
-	db    *sql.DB
-	cache []popular.Product
+	db     *sql.DB
+	client *redis.Client
 }
 
 func (repo *repository) FindPopular(count int) ([]popular.Product, error) {
-	if len(repo.cache) > 0 {
-		return repo.cache, nil
+	products, err := repo.readFromCache()
+	if err == nil {
+		return products, nil
 	}
+
 	sqlStatement := `SELECT product_id, title, description, material, height, color, price, buy_count						
 						FROM popular 
 						ORDER BY buy_count DESC LIMIT $1`
-	var products []popular.Product
 	rows, err := repo.db.Query(sqlStatement, count)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -38,13 +47,36 @@ func (repo *repository) FindPopular(count int) ([]popular.Product, error) {
 		}
 		products = append(products, p)
 	}
-	repo.cache = products
-	go func() {
-		time.Sleep(15 * time.Second)
-		repo.cache = []popular.Product{}
-	}()
+	_ = repo.writeToCache(products)
 
 	return products, errors.WithStack(err)
+}
+
+func (repo *repository) readFromCache() ([]popular.Product, error) {
+	cacheStr, err := repo.client.Get(redisKey).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	var cache cache
+	err = json.Unmarshal([]byte(cacheStr), &cache)
+	if err != nil {
+		return nil, err
+	}
+
+	return cache.Products, nil
+}
+
+func (repo *repository) writeToCache(products []popular.Product) error {
+	if len(products) == 0 {
+		return nil
+	}
+	cache := cache{Products: products}
+	cacheBytes, err := json.Marshal(&cache)
+	if err != nil {
+		return err
+	}
+	return repo.client.Set(redisKey, string(cacheBytes), 10*time.Second).Err()
 }
 
 func (repo *repository) FindByID(id string) (*popular.Product, error) {
